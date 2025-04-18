@@ -1,0 +1,81 @@
+services:
+  back-innogram:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        - APP=innogram
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  back-auth:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        - APP=auth
+    ports:
+      - "3001:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+  postgres:
+    image: postgres:latest
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d ${POSTGRES_DB} -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+
+  mongo:
+    image: mongo:latest
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 40s
+
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - '6379:6379'
+    volumes:
+      - redisdata:/data
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    command: ["redis-server"]
+
+volumes:
+  pgdata:
+  mongodata:
+  redisdata:

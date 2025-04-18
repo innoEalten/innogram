@@ -7,6 +7,8 @@ services:
         - APP=innogram
     ports:
       - "3000:3000"
+    env_file:
+      - .env
     depends_on:
       postgres:
         condition: service_healthy
@@ -23,6 +25,8 @@ services:
         - APP=auth
     ports:
       - "3001:3000"
+    env_file:
+      - .env
     depends_on:
       postgres:
         condition: service_healthy

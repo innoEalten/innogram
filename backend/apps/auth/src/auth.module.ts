@@ -4,6 +4,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { RefreshTokenSchema } from './schemas/refreshToken.schema';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { MongooseModule } from '@nestjs/mongoose';
       envFilePath: '.env',
       validationSchema,
     }),
+
     MongooseModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         uri: configService.get('MONGO_URI'),
@@ -19,6 +21,13 @@ import { MongooseModule } from '@nestjs/mongoose';
       }),
       inject: [ConfigService],
     }),
+
+    MongooseModule.forFeature([
+      {
+        name: 'RefreshToken',
+        schema: RefreshTokenSchema,
+      },
+    ]),
   ],
   controllers: [AuthController],
   providers: [AuthService],

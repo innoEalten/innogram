@@ -16,6 +16,9 @@ export class RefreshToken {
 
   @Prop({ default: false })
   isRevoked: boolean;
+
+  @Prop()
+  createdAt?: Date;
 }
 
 export const RefreshTokenSchema = SchemaFactory.createForClass(RefreshToken);

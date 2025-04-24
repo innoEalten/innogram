@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RefreshTokenSchema } from '../schemas/refreshToken.schema';
+import { getMongoConfig } from './config/mongo.config';
 
 @Module({
   imports: [
@@ -13,10 +14,7 @@ import { RefreshTokenSchema } from '../schemas/refreshToken.schema';
     }),
 
     MongooseModule.forRootAsync({
-      useFactory: (configService: ConfigService) => ({
-        uri: configService.get('MONGO_URI'),
-        dbName: configService.get('MONGO_DB_NAME'),
-      }),
+      useFactory: getMongoConfig,
       inject: [ConfigService],
     }),
 

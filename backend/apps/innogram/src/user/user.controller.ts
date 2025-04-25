@@ -15,6 +15,7 @@ import {
   FindOneByEmailParams,
   FindOneByIdParams,
 } from './dto/find-one-params.dto';
+import * as bcrypt from 'bcryptjs';
 
 @Controller('user')
 export class UserController {
@@ -22,23 +23,28 @@ export class UserController {
 
   @Post()
   @ApiBody({ type: CreateUserDto })
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    const hashedPass = await bcrypt.hash(createUserDto.password, 10);
+
+    return await this.userService.create({
+      ...createUserDto,
+      password: hashedPass,
+    });
   }
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  async findAll() {
+    return await this.userService.findAll();
   }
 
   @Get('id/:id')
-  findOneById(@Param() params: FindOneByIdParams) {
-    return this.userService.findOneById(+params.id);
+  async findOneById(@Param() params: FindOneByIdParams) {
+    return await this.userService.findOneById(+params.id);
   }
 
   @Get('email/:email')
-  findOneByEmail(@Param() params: FindOneByEmailParams) {
-    return this.userService.findOneByEmail(params.email);
+  async findOneByEmail(@Param() params: FindOneByEmailParams) {
+    return await this.userService.findOneByEmail(params.email);
   }
 
   // @Patch(':id')

@@ -3,19 +3,32 @@ import { CreateUserDto } from './dto/create-user.dto';
 // import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '@app/prisma';
 import { UserNotFoundException } from './exeptions/userNotFound.exeption';
+import { Prisma } from '@prisma/client';
+import { UserWithEmailExistsException } from './exeptions/userWithEmailExists';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
-  create(createUserDto: CreateUserDto) {
-    const user = this.prismaService.user.create({
-      data: {
-        email: createUserDto.email,
-        password: createUserDto.password,
-      },
-    });
 
-    return user;
+  async create(createUserDto: CreateUserDto) {
+    try {
+      const user = await this.prismaService.user.create({
+        data: {
+          email: createUserDto.email,
+          password: createUserDto.password,
+        },
+      });
+
+      return user;
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === 'P2002') {
+          throw new UserWithEmailExistsException();
+        }
+      }
+
+      throw err;
+    }
   }
 
   async findAll() {

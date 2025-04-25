@@ -4,10 +4,10 @@ import {
   RefreshToken,
   RefreshTokenDocument,
 } from './schemas/refreshToken.schema';
-import { RegisterUserDto } from './dto/register-user.dto';
+import { CreateUserDto } from '@app/shared';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserResponseDto } from './dto/user-response.dto';
-import { LoginUserDto } from './dto/login-user.dto';
+import { LoginUserDto } from '@app/shared';
 import { HttpClientService } from './http-client/http-client.service';
 
 @Injectable()
@@ -18,7 +18,7 @@ export class AuthService {
     private readonly httpClientService: HttpClientService,
   ) {}
 
-  async register(registerUserDto: RegisterUserDto) {
+  async register(registerUserDto: CreateUserDto) {
     const res = await this.httpClientService.handleRequest(
       this.httpClientService.post<UserResponseDto>(
         'http://localhost:3000/user',

@@ -21,10 +21,11 @@ export class UserService {
 
       return user;
     } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        if (err.code === 'P2002') {
-          throw new UserWithEmailExistsException();
-        }
+      if (
+        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err.code === 'P2002'
+      ) {
+        throw new UserWithEmailExistsException();
       }
 
       throw err;

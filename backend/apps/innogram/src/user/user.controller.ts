@@ -5,6 +5,9 @@ import {
   Body,
   // Patch,
   Param,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+  SerializeOptions,
   // Delete,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -16,8 +19,11 @@ import {
   FindOneByIdParams,
 } from './dto/find-one-params.dto';
 import * as bcrypt from 'bcryptjs';
+import { UserResponseDto } from './dto/user-response.dto';
 
 @Controller('user')
+@UseInterceptors(ClassSerializerInterceptor)
+@SerializeOptions({ type: UserResponseDto })
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -26,10 +32,12 @@ export class UserController {
   async create(@Body() createUserDto: CreateUserDto) {
     const hashedPass = await bcrypt.hash(createUserDto.password, 10);
 
-    return await this.userService.create({
+    const user = await this.userService.create({
       ...createUserDto,
       password: hashedPass,
     });
+
+    return user;
   }
 
   @Get()

@@ -5,6 +5,7 @@ import { AuthService } from './auth.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RefreshTokenSchema } from './schemas/refreshToken.schema';
+import { HttpClientModule } from './http-client/http-client.module';
 
 @Module({
   imports: [
@@ -28,6 +29,8 @@ import { RefreshTokenSchema } from './schemas/refreshToken.schema';
         schema: RefreshTokenSchema,
       },
     ]),
+
+    HttpClientModule,
   ],
   controllers: [AuthController],
   providers: [AuthService],

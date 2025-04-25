@@ -14,12 +14,9 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 // import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiBody } from '@nestjs/swagger';
-import {
-  FindOneByEmailParams,
-  FindOneByIdParams,
-} from './dto/find-one-params.dto';
-import * as bcrypt from 'bcryptjs';
+import { FindOneByIdParams } from './dto/find-one-params.dto';
 import { UserResponseDto } from './dto/user-response.dto';
+import { VerifyPasswordDto } from './dto/verify-password.dto';
 
 @Controller('user')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -30,14 +27,7 @@ export class UserController {
   @Post()
   @ApiBody({ type: CreateUserDto })
   async create(@Body() createUserDto: CreateUserDto) {
-    const hashedPass = await bcrypt.hash(createUserDto.password, 10);
-
-    const user = await this.userService.create({
-      ...createUserDto,
-      password: hashedPass,
-    });
-
-    return user;
+    return await this.userService.create(createUserDto);
   }
 
   @Get()
@@ -45,14 +35,14 @@ export class UserController {
     return await this.userService.findAll();
   }
 
-  @Get('id/:id')
+  @Get(':id')
   async findOneById(@Param() params: FindOneByIdParams) {
     return await this.userService.findOneById(+params.id);
   }
 
-  @Get('email/:email')
-  async findOneByEmail(@Param() params: FindOneByEmailParams) {
-    return await this.userService.findOneByEmail(params.email);
+  @Post('verify-password')
+  async verifyPassword(@Body() verifyPasswordDto: VerifyPasswordDto) {
+    return await this.userService.comparePassword(verifyPasswordDto);
   }
 
   // @Patch(':id')

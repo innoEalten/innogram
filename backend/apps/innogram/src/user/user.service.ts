@@ -1,21 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-// import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '@app/prisma';
 import { UserNotFoundException } from './exeptions/userNotFound.exeption';
 import { Prisma } from '@prisma/client';
 import { UserWithEmailExistsException } from './exeptions/userWithEmailExists';
+import * as bcrypt from 'bcryptjs';
+import { VerifyPasswordDto } from './dto/verify-password.dto';
+import { InvalidCredentialsException } from './exeptions/invalidCredentials.exeption';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
+    const hashedPass = await bcrypt.hash(createUserDto.password, 10);
+
     try {
       const user = await this.prismaService.user.create({
         data: {
           email: createUserDto.email,
-          password: createUserDto.password,
+          password: hashedPass,
         },
       });
 
@@ -50,19 +54,32 @@ export class UserService {
     return user;
   }
 
-  async findOneByEmail(email: string) {
+  async comparePassword(verifyPasswordDto: VerifyPasswordDto) {
+    if (!verifyPasswordDto.email || !verifyPasswordDto.password) {
+      throw new InvalidCredentialsException();
+    }
+
     const user = await this.prismaService.user.findUnique({
-      where: {
-        email,
-      },
+      where: { email: verifyPasswordDto.email },
     });
 
     if (!user) {
-      throw new UserNotFoundException();
+      throw new InvalidCredentialsException();
+    }
+
+    const isPasswordCorrect = await bcrypt.compare(
+      verifyPasswordDto.password,
+      user.password,
+    );
+
+    if (!isPasswordCorrect) {
+      throw new InvalidCredentialsException();
     }
 
     return user;
   }
+
+  // TODO: Implement update user
 
   // update(id: number, updateUserDto: UpdateUserDto) {
   //   return `This action updates a #${id} user`;

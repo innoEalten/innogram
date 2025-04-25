@@ -6,9 +6,3 @@ export class FindOneByIdParams {
   @IsNumberString()
   id: number;
 }
-
-export class FindOneByEmailParams {
-  @ApiProperty()
-  @IsEmail()
-  email: string;
-}

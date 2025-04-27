@@ -1,11 +1,8 @@
 import { validationSchema } from './config/mongo.validate';
 import { Module } from '@nestjs/common';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { RefreshTokenSchema } from './schemas/refreshToken.schema';
-import { HttpClientModule } from './http-client/http-client.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -23,16 +20,7 @@ import { HttpClientModule } from './http-client/http-client.module';
       inject: [ConfigService],
     }),
 
-    MongooseModule.forFeature([
-      {
-        name: 'RefreshToken',
-        schema: RefreshTokenSchema,
-      },
-    ]),
-
-    HttpClientModule,
+    AuthModule,
   ],
-  controllers: [AuthController],
-  providers: [AuthService],
 })
-export class AuthModule {}
+export class AppModule {}

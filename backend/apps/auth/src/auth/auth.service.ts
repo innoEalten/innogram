@@ -8,7 +8,7 @@ import { CreateUserDto } from '@app/shared';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserResponseDto } from './dto/user-response.dto';
 import { LoginUserDto } from '@app/shared';
-import { HttpClientService } from './http-client/http-client.service';
+import { HttpClientService } from '@app/shared';
 
 @Injectable()
 export class AuthService {
@@ -18,13 +18,13 @@ export class AuthService {
     private readonly httpClientService: HttpClientService,
   ) {}
 
-  async register(registerUserDto: CreateUserDto) {
+  async register(createUserDto: CreateUserDto) {
     const res = await this.httpClientService.handleRequest(
       this.httpClientService.post<UserResponseDto>(
         'http://localhost:3000/user',
         {
-          email: registerUserDto.email,
-          password: registerUserDto.password,
+          email: createUserDto.email,
+          password: createUserDto.password,
         },
       ),
     );

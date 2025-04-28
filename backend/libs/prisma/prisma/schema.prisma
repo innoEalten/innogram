@@ -7,10 +7,11 @@ datasource db {
   url      = env("POSTGRES_URI")
 }
 
-model User {
-  id              Int             @id @default(autoincrement())
-  email           String          @unique
-  password        String
+model Profile {
+  user_id              Int             @id
+  name           String          
+  phone        String
+  bio    String
 
   created_at      DateTime        @default(now())
   updated_at      DateTime        @updatedAt @default(now())

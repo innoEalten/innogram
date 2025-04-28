@@ -9,27 +9,24 @@ export class HttpClientService {
 
   async handleRequest<T>(request: Promise<T>) {
     try {
-      const response = await request;
-      return response;
+      return await request;
     } catch (err) {
-      if (err instanceof AxiosError) {
-        if (
-          err.response?.status &&
-          err.response.status >= 400 &&
-          err.response.status < 500
-        ) {
-          throw new HttpException(
-            typeof err.response.data === 'string'
-              ? err.response.data
-              : 'Client error',
-            err.response.status,
-          );
-        }
+      if (err instanceof AxiosError && err.response?.status) {
+        const status = err.response.status;
+        const message =
+          typeof err.response.data === 'string'
+            ? err.response.data
+            : status >= 500
+              ? 'Internal server error'
+              : 'Client error';
+
+        throw new HttpException(message, status);
+      } else {
+        throw new HttpException(
+          'Internal server error',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
-      throw new HttpException(
-        'Internal server error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
     }
   }
 

@@ -1,7 +1,16 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from '@app/shared';
-import { LoginUserDto } from '@app/shared';
+import { CreateUserDto, LoginUserDto } from '@app/shared';
+import { ReqWithUser } from './interfaces/req-with-user.interface';
+import { LocalAuthGuard } from './guards/local-auth.guard';
+import { ApiBody } from '@nestjs/swagger';
 
 @Controller()
 export class AuthController {
@@ -14,7 +23,10 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(200)
-  login(@Body() loginUserDto: LoginUserDto) {
-    return this.authService.login(loginUserDto);
+  @UseGuards(LocalAuthGuard)
+  @ApiBody({ type: LoginUserDto })
+  login(@Req() req: ReqWithUser) {
+    const { user } = req;
+    return user;
   }
 }

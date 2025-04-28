@@ -7,6 +7,8 @@ import {
   RefreshToken,
   RefreshTokenSchema,
 } from './schemas/refreshToken.schema';
+import { PassportModule } from '@nestjs/passport';
+import { LocalAuthStrategy } from './strategies/local-auth.strategy';
 
 @Module({
   imports: [
@@ -17,8 +19,9 @@ import {
       },
     ]),
     HttpClientModule,
+    PassportModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, LocalAuthStrategy],
 })
 export class AuthModule {}

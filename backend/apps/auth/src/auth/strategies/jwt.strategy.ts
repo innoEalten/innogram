@@ -21,10 +21,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: TokenPayload) {
-    const res = await this.httpClientService.handleRequest(
-      this.httpClientService.get<UserResponseDto>(
-        `http://localhost:3000/user/${payload.sub}`,
-      ),
+    const res = await this.httpClientService.get<UserResponseDto>(
+      `http://localhost:3000/user/${payload.sub}`,
     );
 
     return res.data;

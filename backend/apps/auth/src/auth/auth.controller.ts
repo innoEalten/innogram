@@ -27,6 +27,15 @@ export class AuthController {
     return this.authService.validateAccessToken(token);
   }
 
+  @Post('logout')
+  @HttpCode(200)
+  @ApiBearerAuth()
+  logout(@Headers('Authorization') authorization: string) {
+    const token = authorization?.replace('Bearer ', '');
+
+    return this.authService.logout(token);
+  }
+
   @Post('refresh-access-token')
   @HttpCode(200)
   async refreshAccessToken(@Body() refreshTokenDto: RefreshTokenDto) {

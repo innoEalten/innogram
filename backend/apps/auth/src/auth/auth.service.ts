@@ -57,6 +57,12 @@ export class AuthService {
     };
   }
 
+  async logout(token: string) {
+    const { sub: userId } = this.jwtService.validateAccessToken(token);
+
+    await this.userService.deleteRefreshToken(userId);
+  }
+
   validateAccessToken(accessToken: string) {
     return !!this.jwtService.validateAccessToken(accessToken);
   }

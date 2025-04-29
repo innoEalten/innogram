@@ -1,7 +1,15 @@
-import { Controller, Post, Body, HttpCode, Headers } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  Headers,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiBearerAuth } from '@nestjs/swagger';
 import { LoginUserDto, CreateUserDto, RefreshTokenDto } from '@app/shared';
+import { AuthGuard } from './guards/jwt.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -18,13 +26,14 @@ export class AuthController {
     return await this.authService.login(loginUserDto);
   }
 
-  @Post('validate-token')
-  @HttpCode(200)
+  @Post('logout')
+  @UseGuards(AuthGuard)
   @ApiBearerAuth()
-  validateAccessToken(@Headers('Authorization') authorization: string) {
-    const token = authorization?.replace('Bearer ', '');
+  @HttpCode(200)
+  logout(@Headers('Authorization') authorization: string) {
+    const token = authorization.replace('Bearer ', '');
 
-    return this.authService.validateAccessToken(token);
+    return this.authService.logout(token);
   }
 
   @Post('refresh-access-token')

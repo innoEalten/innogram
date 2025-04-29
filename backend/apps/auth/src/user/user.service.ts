@@ -83,13 +83,11 @@ export class UserService {
     );
   }
 
-  // TODO: Implement update user
-
-  // update(id: string, updateUserDto: UpdateUserDto) {
-  //   return `This action updates a #${id} user`;
-  // }
-
-  // remove(id: string) {
-  //   return `This action removes a #${id} user`;
-  // }
+  async deleteRefreshToken(userId: string) {
+    return await this.userModel.findByIdAndUpdate(
+      userId,
+      { refreshToken: null },
+      { new: true },
+    );
+  }
 }

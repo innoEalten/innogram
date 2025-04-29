@@ -4,6 +4,7 @@ import { AuthController } from './auth.controller';
 import { HttpModule } from '@nestjs/axios';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './exceptions/http-exception.filter';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   imports: [HttpModule],
@@ -14,6 +15,7 @@ import { HttpExceptionFilter } from './exceptions/http-exception.filter';
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
     },
+    JwtStrategy,
   ],
 })
 export class AuthModule {}

@@ -33,10 +33,10 @@ export class AuthService {
     return response.data;
   }
 
-  async validateAccessToken<T>(token: string) {
+  async logout<T>(token: string) {
     const response = await firstValueFrom(
       this.httpService.post<T>(
-        `${this.authServiceUrl}/validate-token`,
+        `${this.authServiceUrl}/logout`,
         {},
         {
           headers: {
@@ -45,6 +45,7 @@ export class AuthService {
         },
       ),
     );
+
     return response.data;
   }
 

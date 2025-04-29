@@ -9,6 +9,7 @@ async function bootstrap() {
     .setTitle('Innogram API')
     .setDescription("The innogram's auth app API description")
     .setVersion('0.0.1')
+    .addBearerAuth()
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);

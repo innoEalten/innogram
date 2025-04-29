@@ -51,7 +51,7 @@ export class AuthService {
       ),
     );
 
-    return response.data.isValid;
+    return response.data;
   }
 
   async refreshAccessToken(refreshToken: string) {

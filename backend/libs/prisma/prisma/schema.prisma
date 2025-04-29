@@ -8,10 +8,10 @@ datasource db {
 }
 
 model Profile {
-  user_id              Int             @id
-  name           String          
-  phone        String
-  bio    String
+  user_id         String          @id
+  name            String          
+  phone           String
+  bio             String
 
   created_at      DateTime        @default(now())
   updated_at      DateTime        @updatedAt @default(now())

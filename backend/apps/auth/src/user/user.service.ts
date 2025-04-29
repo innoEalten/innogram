@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserNotFoundException } from './exeptions/userNotFound.exeption';
-import { Prisma } from '@prisma/client';
 import { UserWithEmailExistsException } from './exeptions/userWithEmailExists';
 import * as bcrypt from 'bcryptjs';
 import { VerifyPasswordDto } from './dto/verify-password.dto';
@@ -9,6 +8,7 @@ import { InvalidCredentialsException } from './exeptions/invalidCredentials.exep
 import { User, UserDocument } from '../schemas/user.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { MongoServerError } from 'mongodb';
 
 @Injectable()
 export class UserService {
@@ -23,14 +23,9 @@ export class UserService {
         password: hashedPass,
       });
 
-      // const ref = await this.userModel.
-
       return user;
     } catch (err) {
-      if (
-        err instanceof Prisma.PrismaClientKnownRequestError &&
-        err.code === 'P2002'
-      ) {
+      if (err instanceof MongoServerError && err.code === 11000) {
         throw new UserWithEmailExistsException();
       }
 
@@ -42,7 +37,7 @@ export class UserService {
     return await this.userModel.find();
   }
 
-  async findOneById(id: number) {
+  async findOneById(id: string) {
     const user = await this.userModel.findById(id);
 
     if (!user) {
@@ -77,13 +72,24 @@ export class UserService {
     return user;
   }
 
+  async setRefreshToken(userId: string, refreshToken: string, expiresAt: Date) {
+    return await this.userModel.findByIdAndUpdate(
+      userId,
+      {
+        'refreshToken.token': refreshToken,
+        'refreshToken.expiresAt': expiresAt,
+      },
+      { new: true },
+    );
+  }
+
   // TODO: Implement update user
 
-  // update(id: number, updateUserDto: UpdateUserDto) {
+  // update(id: string, updateUserDto: UpdateUserDto) {
   //   return `This action updates a #${id} user`;
   // }
 
-  // remove(id: number) {
+  // remove(id: string) {
   //   return `This action removes a #${id} user`;
   // }
 }

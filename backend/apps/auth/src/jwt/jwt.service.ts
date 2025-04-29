@@ -5,38 +5,61 @@ import { TokenPayload } from './interfaces/token-payload.interface';
 @Injectable()
 export class JwtService {
   constructor(
-    private readonly jwtService: NestJwtService,
+    private readonly jwtNestService: NestJwtService,
     private readonly configService: ConfigService,
   ) {}
 
-  signAccessToken(userId: number) {
-    const payload: TokenPayload = { sub: userId };
+  private calculateExpiresAt(seconds: number): Date {
+    return new Date(Date.now() + seconds * 1000);
+  }
 
-    return this.jwtService.sign(payload, {
-      secret: this.configService.get('JWT_ACCESS_SECRET'),
-      expiresIn: `${this.configService.get('JWT_ACCESS_EXPIRATION_TIME')}s`,
+  signAccessToken(userId: string) {
+    const payload: TokenPayload = { sub: userId };
+    const expiresIn = parseInt(
+      this.configService.getOrThrow<string>('JWT_ACCESS_EXPIRATION_TIME'),
+    );
+    const secret = this.configService.get<string>('JWT_ACCESS_SECRET');
+
+    const token = this.jwtNestService.sign(payload, {
+      secret,
+      expiresIn: `${expiresIn}s`,
     });
+
+    return { token, expiresAt: this.calculateExpiresAt(expiresIn) };
   }
 
   signRefreshToken(userId: string) {
-    return this.jwtService.sign(
-      { sub: userId },
-      {
-        secret: this.configService.get('JWT_REFRESH_SECRET'),
-        expiresIn: `${this.configService.get('JWT_REFRESH_EXPIRATION_TIME')}s`,
-      },
+    const payload: TokenPayload = { sub: userId };
+    const expiresIn = parseInt(
+      this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRATION_TIME'),
     );
+    const secret = this.configService.get<string>('JWT_REFRESH_SECRET');
+
+    const token = this.jwtNestService.sign(payload, {
+      secret,
+      expiresIn: `${expiresIn}s`,
+    });
+
+    return { token, expiresAt: this.calculateExpiresAt(expiresIn) };
   }
 
   validateAccessToken(token: string) {
     try {
-      return this.jwtService.verify<TokenPayload>(token, {
+      return this.jwtNestService.verify<TokenPayload>(token, {
         secret: this.configService.get('JWT_ACCESS_SECRET'),
       });
-    } catch (error) {
-      console.log(error);
-
+    } catch {
       throw new UnauthorizedException('Invalid access token');
+    }
+  }
+
+  validateRefreshToken(token: string) {
+    try {
+      return this.jwtNestService.verify<TokenPayload>(token, {
+        secret: this.configService.get('JWT_REFRESH_SECRET'),
+      });
+    } catch {
+      throw new UnauthorizedException('Invalid refresh token');
     }
   }
 }

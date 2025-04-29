@@ -11,15 +11,15 @@ export class ProfileService {
     return await this.prisma.profile.create({ data });
   }
 
-  async getProfile(id: number) {
+  async getProfile(id: string) {
     return await this.prisma.profile.findUnique({ where: { user_id: id } });
   }
 
-  async updateProfile(id: number, data: UpdateProfileDto) {
+  async updateProfile(id: string, data: UpdateProfileDto) {
     return await this.prisma.profile.update({ where: { user_id: id }, data });
   }
 
-  async deleteProfile(id: number) {
+  async deleteProfile(id: string) {
     return await this.prisma.profile.delete({ where: { user_id: id } });
   }
 }

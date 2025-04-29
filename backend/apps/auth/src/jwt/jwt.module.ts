@@ -18,5 +18,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
   ],
   providers: [JwtService],
+  exports: [JwtService],
 })
 export class JwtModule {}

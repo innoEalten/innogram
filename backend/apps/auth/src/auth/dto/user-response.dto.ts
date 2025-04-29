@@ -1,6 +1,25 @@
-export class UserResponseDto {
-  id: number;
+import { Exclude, Expose } from 'class-transformer';
+import { User } from '../../schemas/user.schema';
+import { RefreshToken } from '../../schemas/refresh-token.schema';
+import { Types } from 'mongoose';
+
+@Exclude()
+export class UserResponseDto implements User {
+  @Expose()
+  _id: Types.ObjectId;
+
+  @Expose()
   email: string;
-  created_at: Date;
-  updated_at: Date;
+
+  @Expose()
+  createdAt: Date;
+
+  @Expose()
+  updatedAt: Date;
+
+  @Exclude()
+  password: string;
+
+  @Exclude()
+  refreshToken: RefreshToken;
 }

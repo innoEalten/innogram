@@ -1,16 +1,8 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  Post,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto, LoginUserDto } from '@app/shared';
-import { ReqWithUser } from './interfaces/req-with-user.interface';
-import { LocalAuthGuard } from './guards/local-auth.guard';
 import { ApiBody } from '@nestjs/swagger';
+import { ValidateAccessTokenDto } from './dto/validate-access-token.dto';
 
 @Controller()
 export class AuthController {
@@ -23,10 +15,15 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(200)
-  @UseGuards(LocalAuthGuard)
   @ApiBody({ type: LoginUserDto })
-  login(@Req() req: ReqWithUser) {
-    const { user } = req;
-    return user;
+  login(@Body() loginUserDto: LoginUserDto) {
+    return this.authService.login(loginUserDto);
+  }
+
+  @Post('validate-token')
+  validateAccessToken(@Body() validateAccessTokenDto: ValidateAccessTokenDto) {
+    return this.authService.validateAccessToken(
+      validateAccessTokenDto.accessToken,
+    );
   }
 }

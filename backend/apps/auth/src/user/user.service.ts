@@ -1,27 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { PrismaService } from '@app/prisma';
 import { UserNotFoundException } from './exeptions/userNotFound.exeption';
 import { Prisma } from '@prisma/client';
 import { UserWithEmailExistsException } from './exeptions/userWithEmailExists';
 import * as bcrypt from 'bcryptjs';
 import { VerifyPasswordDto } from './dto/verify-password.dto';
 import { InvalidCredentialsException } from './exeptions/invalidCredentials.exeption';
+import { User, UserDocument } from '../schemas/user.schema';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   async create(createUserDto: CreateUserDto) {
     const hashedPass = await bcrypt.hash(createUserDto.password, 10);
 
     try {
-      const user = await this.prismaService.user.create({
-        data: {
-          email: createUserDto.email,
-          password: hashedPass,
-        },
+      const user = await this.userModel.create({
+        email: createUserDto.email,
+        password: hashedPass,
       });
+
+      // const ref = await this.userModel.
 
       return user;
     } catch (err) {
@@ -37,15 +39,11 @@ export class UserService {
   }
 
   async findAll() {
-    return await this.prismaService.user.findMany();
+    return await this.userModel.find();
   }
 
   async findOneById(id: number) {
-    const user = await this.prismaService.user.findUnique({
-      where: {
-        id,
-      },
-    });
+    const user = await this.userModel.findById(id);
 
     if (!user) {
       throw new UserNotFoundException();
@@ -59,8 +57,8 @@ export class UserService {
       throw new InvalidCredentialsException();
     }
 
-    const user = await this.prismaService.user.findUnique({
-      where: { email: verifyPasswordDto.email },
+    const user = await this.userModel.findOne({
+      email: verifyPasswordDto.email,
     });
 
     if (!user) {

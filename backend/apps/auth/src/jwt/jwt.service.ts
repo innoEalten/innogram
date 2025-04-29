@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService as NestJwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { TokenPayload } from './interfaces/token-payload.interface';
@@ -26,5 +26,17 @@ export class JwtService {
         expiresIn: `${this.configService.get('JWT_REFRESH_EXPIRATION_TIME')}s`,
       },
     );
+  }
+
+  validateAccessToken(token: string) {
+    try {
+      return this.jwtService.verify<TokenPayload>(token, {
+        secret: this.configService.get('JWT_ACCESS_SECRET'),
+      });
+    } catch (error) {
+      console.log(error);
+
+      throw new UnauthorizedException('Invalid access token');
+    }
   }
 }

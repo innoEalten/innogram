@@ -3,6 +3,7 @@ import { AuthModule } from './auth/auth.module';
 import { ProfileModule } from './profile/profile.module';
 import { ConfigModule } from '@nestjs/config';
 import { validationSchema } from './config/env.validate';
+import { PostModule } from './post/post.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { validationSchema } from './config/env.validate';
     }),
     AuthModule,
     ProfileModule,
+    PostModule,
   ],
   controllers: [],
   providers: [],

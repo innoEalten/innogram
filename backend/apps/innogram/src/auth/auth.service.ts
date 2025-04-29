@@ -3,12 +3,6 @@ import { CreateUserDto, LoginUserDto } from '@app/shared';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
-import { AxiosResponse } from 'axios';
-
-export interface AuthResponse {
-  accessToken: string;
-  refreshToken: string;
-}
 
 @Injectable()
 export class AuthService {
@@ -22,25 +16,26 @@ export class AuthService {
       this.configService.getOrThrow<string>('AUTH_SERVICE_URL');
   }
 
-  async register(createUserDto: CreateUserDto) {
-    const response: AxiosResponse<AuthResponse> = await firstValueFrom(
-      this.httpService.post(`${this.authServiceUrl}/register`, createUserDto),
+  async register<T>(createUserDto: CreateUserDto) {
+    const response = await firstValueFrom(
+      this.httpService.post<T>(
+        `${this.authServiceUrl}/register`,
+        createUserDto,
+      ),
     );
-
     return response.data;
   }
 
-  async login(loginUserDto: LoginUserDto) {
-    const response: AxiosResponse<AuthResponse> = await firstValueFrom(
-      this.httpService.post(`${this.authServiceUrl}/login`, loginUserDto),
+  async login<T>(loginUserDto: LoginUserDto) {
+    const response = await firstValueFrom(
+      this.httpService.post<T>(`${this.authServiceUrl}/login`, loginUserDto),
     );
-
     return response.data;
   }
 
-  async validateAccessToken(token: string) {
-    const response: AxiosResponse<{ isValid: boolean }> = await firstValueFrom(
-      this.httpService.post(
+  async validateAccessToken<T>(token: string) {
+    const response = await firstValueFrom(
+      this.httpService.post<T>(
         `${this.authServiceUrl}/validate-token`,
         {},
         {
@@ -50,17 +45,15 @@ export class AuthService {
         },
       ),
     );
-
     return response.data;
   }
 
-  async refreshAccessToken(refreshToken: string) {
-    const response: AxiosResponse<AuthResponse> = await firstValueFrom(
-      this.httpService.post(`${this.authServiceUrl}/refresh-access-token`, {
+  async refreshAccessToken<T>(refreshToken: string) {
+    const response = await firstValueFrom(
+      this.httpService.post<T>(`${this.authServiceUrl}/refresh-access-token`, {
         refreshToken,
       }),
     );
-
     return response.data;
   }
 }

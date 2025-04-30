@@ -1,0 +1,30 @@
+interface User {
+  _id: string;
+  _v: number;
+  email: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface Tokens {
+  access: Token;
+  refresh: Token;
+}
+
+interface Token {
+  token: string;
+  expiresAt: string;
+}
+
+export interface AuthResponseDto {
+  user: User;
+  tokens: Tokens;
+}
+
+export type RegisterResponseDto = AuthResponseDto;
+export type LoginResponseDto = AuthResponseDto;
+export type LogoutResponseDto = object;
+
+export interface RefreshTokenResponseDto {
+  tokens: Tokens;
+}

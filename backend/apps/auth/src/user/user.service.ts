@@ -76,8 +76,10 @@ export class UserService {
     return await this.userModel.findByIdAndUpdate(
       userId,
       {
-        'refreshToken.token': refreshToken,
-        'refreshToken.expiresAt': expiresAt,
+        refreshToken: {
+          token: refreshToken,
+          expiresAt: expiresAt,
+        },
       },
       { new: true },
     );

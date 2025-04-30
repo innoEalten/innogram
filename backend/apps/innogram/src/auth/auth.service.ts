@@ -25,7 +25,9 @@ export class AuthService {
   }
 
   async register(createUserDto: CreateUserDto) {
-    const response = await firstValueFrom(
+    const {
+      data: { user, tokens },
+    } = await firstValueFrom(
       this.httpService.post<RegisterResponseDto>(
         `${this.authServiceUrl}/register`,
         createUserDto,
@@ -33,32 +35,32 @@ export class AuthService {
     );
 
     const profile = await this.profileService.createProfile({
-      user_id: response.data.user._id,
+      user_id: user._id,
       name: createUserDto.name,
       phone: createUserDto.phone,
       bio: '',
     });
 
-    return { ...response.data, profile };
+    return { user, profile, tokens };
   }
 
   async login(loginUserDto: LoginUserDto) {
-    const response = await firstValueFrom(
+    const {
+      data: { user, tokens },
+    } = await firstValueFrom(
       this.httpService.post<LoginResponseDto>(
         `${this.authServiceUrl}/login`,
         loginUserDto,
       ),
     );
 
-    const profile = await this.profileService.getProfile(
-      response.data.user._id,
-    );
+    const profile = await this.profileService.getProfile(user._id);
 
-    return { ...response.data, profile };
+    return { user, profile, tokens };
   }
 
   async logout(token: string) {
-    const response = await firstValueFrom(
+    const { data } = await firstValueFrom(
       this.httpService.post<LogoutResponseDto>(
         `${this.authServiceUrl}/logout`,
         {},
@@ -70,11 +72,13 @@ export class AuthService {
       ),
     );
 
-    return response.data;
+    return data;
   }
 
   async refreshAccessToken(refreshToken: string) {
-    const response = await firstValueFrom(
+    const {
+      data: { tokens },
+    } = await firstValueFrom(
       this.httpService.post<RefreshTokenResponseDto>(
         `${this.authServiceUrl}/refresh-access-token`,
         {
@@ -82,6 +86,7 @@ export class AuthService {
         },
       ),
     );
-    return response.data;
+
+    return tokens;
   }
 }

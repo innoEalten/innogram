@@ -15,9 +15,9 @@ export class JwtStrategy {
       this.configService.getOrThrow<string>('AUTH_SERVICE_URL');
   }
 
-  async validateRequest<T>(token: string) {
+  async validateRequest(token: string) {
     const response = await firstValueFrom(
-      this.httpService.post<T>(
+      this.httpService.post<boolean>(
         `${this.authServiceUrl}/validate-token`,
         {},
         {

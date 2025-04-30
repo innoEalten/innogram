@@ -5,9 +5,11 @@ import { HttpModule } from '@nestjs/axios';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './exceptions/http-exception.filter';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { PrismaModule } from '@app/prisma';
+import { ProfileModule } from '../profile/profile.module';
 
 @Module({
-  imports: [HttpModule],
+  imports: [HttpModule, PrismaModule, ProfileModule],
   controllers: [AuthController],
   providers: [
     AuthService,

@@ -1,4 +1,4 @@
-interface User {
+export interface User {
   _id: string;
   _v: number;
   email: string;
@@ -6,7 +6,7 @@ interface User {
   updatedAt: string;
 }
 
-interface Tokens {
+export interface Tokens {
   access: Token;
   refresh: Token;
 }

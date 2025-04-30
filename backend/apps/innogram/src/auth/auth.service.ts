@@ -10,6 +10,7 @@ import {
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
+import { ProfileService } from '../profile/profile.service';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,7 @@ export class AuthService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    private readonly profileService: ProfileService,
   ) {
     this.authServiceUrl =
       this.configService.getOrThrow<string>('AUTH_SERVICE_URL');
@@ -29,7 +31,15 @@ export class AuthService {
         createUserDto,
       ),
     );
-    return response.data;
+
+    const profile = await this.profileService.createProfile({
+      user_id: response.data.user._id,
+      name: createUserDto.name,
+      phone: createUserDto.phone,
+      bio: '',
+    });
+
+    return { ...response.data, profile };
   }
 
   async login(loginUserDto: LoginUserDto) {
@@ -39,7 +49,12 @@ export class AuthService {
         loginUserDto,
       ),
     );
-    return response.data;
+
+    const profile = await this.profileService.getProfile(
+      response.data.user._id,
+    );
+
+    return { ...response.data, profile };
   }
 
   async logout(token: string) {

@@ -8,7 +8,9 @@ export class ProfileService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createProfile(data: CreateProfileDto) {
-    return await this.prisma.profile.create({ data });
+    return await this.prisma.profile.create({
+      data,
+    });
   }
 
   async getProfile(id: string) {

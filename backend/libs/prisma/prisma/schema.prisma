@@ -12,7 +12,18 @@ model Profile {
   name            String          
   phone           String
   bio             String
+  posts           Post[]
 
   created_at      DateTime        @default(now())
   updated_at      DateTime        @updatedAt @default(now())
+}
+
+model Post {
+  id String @id @default(uuid())
+  title String
+  body String
+  created_at DateTime @default(now())
+  author_id String
+  
+  author Profile @relation(fields: [author_id], references: [user_id])
 }

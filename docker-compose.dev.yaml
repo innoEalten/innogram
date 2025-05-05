@@ -7,7 +7,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./docker/pgdata:/var/lib/postgresql/data 
+      - ./docker/pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d ${POSTGRES_DB} -U ${POSTGRES_USER}"]
       interval: 10s
@@ -34,7 +34,7 @@ services:
     image: redis:latest
     restart: always
     ports:
-      - '6379:6379'
+      - "6379:6379"
     volumes:
       - ./docker/redisdata:/data
     env_file:
@@ -45,3 +45,19 @@ services:
       timeout: 3s
       retries: 30
     command: ["redis-server"]
+
+  minio:
+    image: bitnami/minio:latest
+    restart: always
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - ./docker/minio:/bitnami/minio/data

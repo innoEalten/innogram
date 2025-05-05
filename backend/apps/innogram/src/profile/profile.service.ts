@@ -14,7 +14,20 @@ export class ProfileService {
   }
 
   async getProfile(id: string) {
-    return await this.prisma.profile.findUnique({ where: { user_id: id } });
+    const profile = await this.prisma.profile.findUnique({
+      where: { user_id: id },
+    });
+
+    if (!profile) {
+      await this.createProfile({
+        user_id: id,
+        name: '',
+        phone: '',
+        bio: '',
+      });
+    }
+
+    return profile;
   }
 
   async updateProfile(id: string, data: UpdateProfileDto) {

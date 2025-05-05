@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
+import { ValidateTokenResponseDto } from '@app/shared/dto/auth-response.dto';
 
 @Injectable()
 export class JwtStrategy {
@@ -16,8 +17,8 @@ export class JwtStrategy {
   }
 
   async validateRequest(token: string) {
-    const response = await firstValueFrom(
-      this.httpService.post<boolean>(
+    const { data } = await firstValueFrom(
+      this.httpService.post<ValidateTokenResponseDto>(
         `${this.authServiceUrl}/validate-token`,
         {},
         {
@@ -28,10 +29,10 @@ export class JwtStrategy {
       ),
     );
 
-    if (!response.data) {
+    if (!data) {
       throw new UnauthorizedException();
     }
 
-    return response.data;
+    return data;
   }
 }

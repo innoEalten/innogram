@@ -7,22 +7,24 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { AuthGuard } from '../auth/guards/jwt.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { RequestWithUser } from './dto/req-user.dto';
 
 @Controller('post')
+@UseGuards(AuthGuard)
+@ApiBearerAuth()
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Post()
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth()
-  create(@Body() createPostDto: CreatePostDto) {
-    return this.postService.create(createPostDto, 'a');
+  create(@Body() createPostDto: CreatePostDto, @Req() req: RequestWithUser) {
+    return this.postService.create(createPostDto, req.user._id);
   }
 
   @Get()
@@ -36,15 +38,11 @@ export class PostController {
   }
 
   @Patch(':id')
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth()
   update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
     return this.postService.update(id, updatePostDto);
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth()
   remove(@Param('id') id: string) {
     return this.postService.remove(id);
   }

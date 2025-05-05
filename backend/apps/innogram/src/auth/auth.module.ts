@@ -19,5 +19,6 @@ import { ProfileModule } from '../profile/profile.module';
     },
     JwtStrategy,
   ],
+  exports: [JwtStrategy],
 })
 export class AuthModule {}

@@ -77,8 +77,21 @@ export class AuthService {
     await this.userService.deleteRefreshToken(userId);
   }
 
-  validateAccessToken(accessToken: string) {
-    return !!this.jwtService.validateAccessToken(accessToken);
+  async validateAccessToken(accessToken: string) {
+    const user = await this.userService.findOneById(
+      this.jwtService.validateAccessToken(accessToken).sub,
+    );
+
+    return plainToClass(
+      UserResponseDto,
+      {
+        ...user.toObject(),
+        _id: user._id.toString(),
+      },
+      {
+        excludeExtraneousValues: false,
+      },
+    );
   }
 
   async refreshAccessToken(refreshToken: string) {

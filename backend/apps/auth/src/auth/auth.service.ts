@@ -28,9 +28,16 @@ export class AuthService {
     );
 
     return {
-      user: plainToClass(UserResponseDto, user, {
-        excludeExtraneousValues: true,
-      }),
+      user: plainToClass(
+        UserResponseDto,
+        {
+          ...user.toObject(),
+          _id: user._id.toString(),
+        },
+        {
+          excludeExtraneousValues: true,
+        },
+      ),
       tokens,
     };
   }
@@ -50,9 +57,16 @@ export class AuthService {
     );
 
     return {
-      user: plainToClass(UserResponseDto, user, {
-        excludeExtraneousValues: false,
-      }),
+      user: plainToClass(
+        UserResponseDto,
+        {
+          ...user.toObject(),
+          _id: user._id.toString(),
+        },
+        {
+          excludeExtraneousValues: false,
+        },
+      ),
       tokens,
     };
   }

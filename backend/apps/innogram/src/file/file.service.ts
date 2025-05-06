@@ -4,16 +4,20 @@ import { InjectMinio } from '../minio/minio.decorator';
 import { PrismaService } from '@app/prisma';
 import { File } from '@prisma/client';
 import { FileSubdirectory } from './enum/file.enum';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class FileService {
-  // TODO: get from env
-  protected _bucketName = 'innogram';
+  protected readonly _bucketName: string;
 
   constructor(
     @InjectMinio() private readonly minioService: Client,
     private readonly prisma: PrismaService,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    this._bucketName =
+      this.configService.getOrThrow<string>('MINIO_BUCKET_NAME');
+  }
 
   async bucketsList() {
     return await this.minioService.listBuckets();

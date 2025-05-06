@@ -13,7 +13,10 @@ model Profile {
   phone           String
   bio             String
   posts           Post[]
-
+  
+  image_id        String?         @unique
+  image           Image?          @relation(fields: [image_id], references: [id])
+  
   created_at      DateTime        @default(now())
   updated_at      DateTime        @updatedAt @default(now())
 }
@@ -26,4 +29,19 @@ model Post {
   author_id String
   
   author Profile @relation(fields: [author_id], references: [user_id])
+}
+
+model File {
+  id String @id @default(uuid())
+  url String
+
+  image Image?
+}
+
+model Image {
+  id String @id @default(uuid())
+  file_id String @unique
+
+  profile Profile?
+  file File? @relation(fields: [file_id], references: [id])
 }

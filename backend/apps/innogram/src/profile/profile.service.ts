@@ -19,7 +19,7 @@ export class ProfileService {
     });
 
     if (!profile) {
-      await this.createProfile({
+      return await this.createProfile({
         user_id: id,
         name: '',
         phone: '',
@@ -28,6 +28,13 @@ export class ProfileService {
     }
 
     return profile;
+  }
+
+  async uploadAvatar(id: string, file: Express.Multer.File) {
+    const profile = await this.getProfile(id);
+    const filename = `${profile.user_id}-${Date.now()}-${file.originalname}`;
+    // const url = await this.fileService.uploadFile(filename, file.buffer);
+    // return url;
   }
 
   async updateProfile(id: string, data: UpdateProfileDto) {

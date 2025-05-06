@@ -4,7 +4,9 @@ import { ProfileModule } from './profile/profile.module';
 import { ConfigModule } from '@nestjs/config';
 import { validationSchema } from './config/env.validate';
 import { PostModule } from './post/post.module';
-
+import { FileModule } from './file/file.module';
+import { MinioModule } from './minio/minio.module';
+import { ImageModule } from './image/image.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -15,6 +17,9 @@ import { PostModule } from './post/post.module';
     AuthModule,
     ProfileModule,
     PostModule,
+    MinioModule,
+    FileModule,
+    ImageModule,
   ],
   controllers: [],
   providers: [],

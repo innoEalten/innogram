@@ -16,7 +16,7 @@ export class PostService {
     });
   }
 
-  findAll() {
+  async findAll() {
     return this.prisma.post.findMany();
   }
 

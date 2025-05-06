@@ -2,10 +2,14 @@ import { PrismaService } from '@app/prisma';
 import { Injectable } from '@nestjs/common';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { ImageService } from '../image/image.service';
 
 @Injectable()
 export class ProfileService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly imageService: ImageService,
+  ) {}
 
   async createProfile(data: CreateProfileDto) {
     return await this.prisma.profile.create({
@@ -16,6 +20,13 @@ export class ProfileService {
   async getProfile(id: string) {
     const profile = await this.prisma.profile.findUnique({
       where: { user_id: id },
+      include: {
+        image: {
+          include: {
+            file: true,
+          },
+        },
+      },
     });
 
     if (!profile) {
@@ -33,8 +44,9 @@ export class ProfileService {
   async uploadAvatar(id: string, file: Express.Multer.File) {
     const profile = await this.getProfile(id);
     const filename = `${profile.user_id}-${Date.now()}-${file.originalname}`;
-    // const url = await this.fileService.uploadFile(filename, file.buffer);
-    // return url;
+    const url = await this.imageService.uploadImage(file, filename);
+
+    return url;
   }
 
   async updateProfile(id: string, data: UpdateProfileDto) {

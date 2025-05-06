@@ -18,16 +18,14 @@ export class FileService {
     return await this.minioService.listBuckets();
   }
 
-  async uploadFile(file: Express.Multer.File): Promise<File> {
-    await this.minioService.putObject(
-      this._bucketName,
-      file.originalname,
-      file.buffer,
-    );
+  async uploadFile(file: Express.Multer.File, filename: string) {
+    await this.minioService.putObject(this._bucketName, filename, file.buffer);
+
+    console.log(filename);
 
     return this.prisma.file.create({
       data: {
-        url: `/${this._bucketName}/${file.originalname}`,
+        url: `/${this._bucketName}/${filename}`,
       },
     });
   }

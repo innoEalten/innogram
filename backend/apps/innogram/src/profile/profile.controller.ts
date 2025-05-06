@@ -1,8 +1,17 @@
-import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { AuthGuard } from '../auth/guards/jwt.guard';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { RequestWithUser } from '../auth/dto/req-user.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @UseGuards(AuthGuard)
 @ApiBearerAuth()
@@ -16,7 +25,29 @@ export class ProfileController {
   }
 
   @Post()
-  async uploadAvatar(@Req() req: RequestWithUser, @Body() file: Express.Multer.File) {
-    return this.profileService.uploadAvatar(req.user._id, file);
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async uploadAvatar(
+    @Req() req: RequestWithUser,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const { id } = await this.profileService.uploadAvatar(req.user._id, file);
+
+    const profile = await this.profileService.updateProfile(req.user._id, {
+      image_id: id,
+    });
+
+    return profile;
   }
 }

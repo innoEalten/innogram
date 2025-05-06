@@ -2,5 +2,5 @@ import { PartialType } from '@nestjs/mapped-types';
 import { CreateProfileDto } from './create-profile.dto';
 
 export class UpdateProfileDto extends PartialType(CreateProfileDto) {
-  user_id: string;
+  image_id?: string;
 }

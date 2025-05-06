@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { HttpModule } from '@nestjs/axios';
@@ -9,7 +9,7 @@ import { PrismaModule } from '@app/prisma';
 import { ProfileModule } from '../profile/profile.module';
 
 @Module({
-  imports: [HttpModule, PrismaModule, ProfileModule],
+  imports: [HttpModule, PrismaModule, forwardRef(() => ProfileModule)],
   controllers: [AuthController],
   providers: [
     AuthService,

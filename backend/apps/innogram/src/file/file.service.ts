@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Client } from 'minio';
 import { InjectMinio } from '../minio/minio.decorator';
 import { PrismaService } from '@app/prisma';
@@ -37,5 +37,18 @@ export class FileService {
         url: `/${this._bucketName}/${filePath}`,
       },
     });
+  }
+
+  async deleteFile(file_id: string) {
+    const file = await this.prisma.file.findUnique({
+      where: { id: file_id },
+    });
+
+    if (!file) {
+      throw new NotFoundException('File not found');
+    }
+
+    await this.minioService.removeObject(this._bucketName, file.url);
+    await this.prisma.file.delete({ where: { id: file_id } });
   }
 }

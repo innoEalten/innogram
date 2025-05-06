@@ -44,14 +44,23 @@ export class ProfileService {
 
   async uploadAvatar(id: string, file: Express.Multer.File) {
     const profile = await this.getProfile(id);
+
     const filename = `${profile.user_id}-${Date.now()}-${file.originalname}`;
-    const url = await this.imageService.uploadImage(
+    const imageEntity = await this.imageService.uploadImage(
       file,
       filename,
       FileSubdirectory.AVATARS,
     );
 
-    return url;
+    const updatedProfile = await this.updateProfile(id, {
+      image_id: imageEntity.id,
+    });
+
+    if (profile.image_id) {
+      await this.imageService.deleteImage(profile.image_id);
+    }
+
+    return updatedProfile;
   }
 
   async updateProfile(id: string, data: UpdateProfileDto) {

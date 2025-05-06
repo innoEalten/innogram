@@ -42,11 +42,7 @@ export class ProfileController {
     @Req() req: RequestWithUser,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const { id } = await this.profileService.uploadAvatar(req.user._id, file);
-
-    const profile = await this.profileService.updateProfile(req.user._id, {
-      image_id: id,
-    });
+    const profile = await this.profileService.uploadAvatar(req.user._id, file);
 
     return profile;
   }

@@ -1,6 +1,9 @@
 import {
   Controller,
+  FileTypeValidator,
   Get,
+  MaxFileSizeValidator,
+  ParseFilePipe,
   Post,
   Req,
   UploadedFile,
@@ -40,7 +43,15 @@ export class ProfileController {
   })
   async uploadAvatar(
     @Req() req: RequestWithUser,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 1 }),
+          new FileTypeValidator({ fileType: 'image/*' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
   ) {
     const profile = await this.profileService.uploadAvatar(req.user._id, file);
 

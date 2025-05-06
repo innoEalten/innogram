@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ImageService } from '../image/image.service';
+import { FileSubdirectory } from '../file/enum/file.enum';
 
 @Injectable()
 export class ProfileService {
@@ -44,7 +45,11 @@ export class ProfileService {
   async uploadAvatar(id: string, file: Express.Multer.File) {
     const profile = await this.getProfile(id);
     const filename = `${profile.user_id}-${Date.now()}-${file.originalname}`;
-    const url = await this.imageService.uploadImage(file, filename);
+    const url = await this.imageService.uploadImage(
+      file,
+      filename,
+      FileSubdirectory.AVATARS,
+    );
 
     return url;
   }

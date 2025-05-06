@@ -3,6 +3,7 @@ import { Client } from 'minio';
 import { InjectMinio } from '../minio/minio.decorator';
 import { PrismaService } from '@app/prisma';
 import { File } from '@prisma/client';
+import { FileSubdirectory } from './enum/file.enum';
 
 @Injectable()
 export class FileService {
@@ -18,14 +19,18 @@ export class FileService {
     return await this.minioService.listBuckets();
   }
 
-  async uploadFile(file: Express.Multer.File, filename: string) {
-    await this.minioService.putObject(this._bucketName, filename, file.buffer);
+  async uploadFile(
+    file: Express.Multer.File,
+    filename: string,
+    subdirectory?: FileSubdirectory,
+  ) {
+    const filePath = subdirectory ? `${subdirectory}/${filename}` : filename;
 
-    console.log(filename);
+    await this.minioService.putObject(this._bucketName, filePath, file.buffer);
 
     return this.prisma.file.create({
       data: {
-        url: `/${this._bucketName}/${filename}`,
+        url: `/${this._bucketName}/${filePath}`,
       },
     });
   }

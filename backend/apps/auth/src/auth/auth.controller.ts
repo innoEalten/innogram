@@ -39,8 +39,6 @@ export class AuthController {
   @Post('refresh-access-token')
   @HttpCode(200)
   async refreshAccessToken(@Body() refreshTokenDto: RefreshTokenDto) {
-    return await this.authService.refreshAccessToken(
-      refreshTokenDto.refreshToken,
-    );
+    return this.authService.refreshAccessToken(refreshTokenDto.refreshToken);
   }
 }

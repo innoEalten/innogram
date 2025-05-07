@@ -34,7 +34,7 @@ export class UserService {
   }
 
   async findAll() {
-    return await this.userModel.find();
+    return this.userModel.find();
   }
 
   async findOneById(id: string) {
@@ -73,7 +73,7 @@ export class UserService {
   }
 
   async setRefreshToken(userId: string, refreshToken: string, expiresAt: Date) {
-    return await this.userModel.findByIdAndUpdate(
+    return this.userModel.findByIdAndUpdate(
       userId,
       {
         refreshToken: {
@@ -86,7 +86,7 @@ export class UserService {
   }
 
   async deleteRefreshToken(userId: string) {
-    return await this.userModel.findByIdAndUpdate(
+    return this.userModel.findByIdAndUpdate(
       userId,
       { refreshToken: null },
       { new: true },

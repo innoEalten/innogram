@@ -1,7 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MINIO_TOKEN } from './minio.decorator';
-import { Client } from 'minio';
+import { minioConfig } from './config/minio.config';
 
 @Global()
 @Module({
@@ -10,17 +10,7 @@ import { Client } from 'minio';
     {
       inject: [ConfigService],
       provide: MINIO_TOKEN,
-      useFactory: (configService: ConfigService): Client => {
-        const client = new Client({
-          endPoint: configService.getOrThrow('MINIO_ENDPOINT'),
-          port: +configService.getOrThrow('MINIO_PORT'),
-          accessKey: configService.getOrThrow('MINIO_ACCESS_KEY'),
-          secretKey: configService.getOrThrow('MINIO_SECRET_KEY'),
-          useSSL: false,
-        });
-
-        return client;
-      },
+      useFactory: minioConfig,
     },
   ],
 })

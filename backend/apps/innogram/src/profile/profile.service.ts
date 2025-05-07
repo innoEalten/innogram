@@ -4,6 +4,7 @@ import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ImageService } from '../image/image.service';
 import { FileSubdirectory } from '../file/enum/file.enum';
+import { ProfileNotFoundException } from './exeptions/profileNotFound.exeption';
 
 @Injectable()
 export class ProfileService {
@@ -31,12 +32,7 @@ export class ProfileService {
     });
 
     if (!profile) {
-      return await this.createProfile({
-        user_id: id,
-        name: '',
-        phone: '',
-        bio: '',
-      });
+      throw new ProfileNotFoundException();
     }
 
     return profile;

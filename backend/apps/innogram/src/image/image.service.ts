@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@app/prisma/prisma.service';
 import { FileService } from '../file/file.service';
 import { FileSubdirectory } from '../file/enum/file.enum';
+import { ImageNotFoundException } from './exeptions/imageNotFound.exeption';
 
 @Injectable()
 export class ImageService {
@@ -33,7 +34,7 @@ export class ImageService {
     });
 
     if (!image) {
-      throw new NotFoundException('Image not found');
+      throw new ImageNotFoundException();
     }
 
     await this.prisma.image.delete({ where: { id: image_id } });

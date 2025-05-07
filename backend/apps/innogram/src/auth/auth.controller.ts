@@ -17,13 +17,13 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() registerUserDto: CreateUserDto) {
-    return await this.authService.register(registerUserDto);
+    return this.authService.register(registerUserDto);
   }
 
   @Post('login')
   @HttpCode(200)
   async login(@Body() loginUserDto: LoginUserDto) {
-    return await this.authService.login(loginUserDto);
+    return this.authService.login(loginUserDto);
   }
 
   @Post('logout')
@@ -39,8 +39,6 @@ export class AuthController {
   @Post('refresh-access-token')
   @HttpCode(200)
   async refreshAccessToken(@Body() refreshTokenDto: RefreshTokenDto) {
-    return await this.authService.refreshAccessToken(
-      refreshTokenDto.refreshToken,
-    );
+    return this.authService.refreshAccessToken(refreshTokenDto.refreshToken);
   }
 }

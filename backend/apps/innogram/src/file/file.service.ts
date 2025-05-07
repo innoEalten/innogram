@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Client } from 'minio';
 import { InjectMinio } from '../minio/minio.decorator';
 import { PrismaService } from '@app/prisma';
 import { File } from '@prisma/client';
 import { FileSubdirectory } from './enum/file.enum';
 import { ConfigService } from '@nestjs/config';
+import { FileNotFoundException } from './exeptions/fileNotFound.exeption';
 
 @Injectable()
 export class FileService {
@@ -45,7 +46,7 @@ export class FileService {
     });
 
     if (!file) {
-      throw new NotFoundException('File not found');
+      throw new FileNotFoundException();
     }
 
     await this.minioService.removeObject(this._bucketName, file.url);

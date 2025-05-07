@@ -15,6 +15,7 @@ export class ImageService {
     file: Express.Multer.File,
     filename: string,
     subdirectory?: FileSubdirectory,
+    post_id?: string,
   ) {
     const uploaded_file = await this.fileService.uploadFile(
       file,
@@ -22,7 +23,7 @@ export class ImageService {
       subdirectory,
     );
 
-    return this.imageRepository.create(uploaded_file.id);
+    return this.imageRepository.create(uploaded_file.id, post_id);
   }
 
   async deleteImage(id: string) {

@@ -8,40 +8,43 @@ datasource db {
 }
 
 model Profile {
-  user_id         String          @id
-  name            String          
-  phone           String
-  bio             String
-  posts           Post[]
-  
-  image_id        String?         @unique
-  image           Image?          @relation(fields: [image_id], references: [id])
-  
-  created_at      DateTime        @default(now())
-  updated_at      DateTime        @updatedAt @default(now())
+  user_id String @id
+  name    String
+  phone   String
+  bio     String
+  posts   Post[]
+
+  image_id String? @unique @map("imageId")
+  image    Image?  @relation(fields: [image_id], references: [id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
 }
 
 model Post {
-  id String @id @default(uuid())
-  title String
-  body String
-  created_at DateTime @default(now())
-  author_id String
-  
+  id         String   @id @default(uuid())
+  title      String
+  body       String
+  created_at DateTime @default(now()) @map("createdAt")
+  author_id  String  @map("authorId")
+
+  images Image[]
   author Profile @relation(fields: [author_id], references: [user_id])
 }
 
 model File {
-  id String @id @default(uuid())
+  id  String @id @default(uuid())
   url String
 
   image Image?
 }
 
 model Image {
-  id String @id @default(uuid())
-  file_id String @unique
+  id      String  @id @default(uuid())
+  file_id String @unique @map("fileId")
+  post_id String? @map("postId")
 
   profile Profile?
-  file File? @relation(fields: [file_id], references: [id])
+  post    Post?    @relation(fields: [post_id], references: [id])
+  file    File    @relation(fields: [file_id], references: [id])
 }

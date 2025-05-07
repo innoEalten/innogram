@@ -1,9 +1,6 @@
 import {
   Controller,
-  FileTypeValidator,
   Get,
-  MaxFileSizeValidator,
-  ParseFilePipe,
   Post,
   UploadedFile,
   UseGuards,
@@ -15,6 +12,7 @@ import { ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { User } from '../auth/decorators/user.decorator';
 import { User as UserType } from '@app/shared';
+import { avatarFileValidationPipe } from './pipes/avatar-file-validation.pipe';
 
 @UseGuards(AuthGuard)
 @ApiBearerAuth()
@@ -43,14 +41,7 @@ export class ProfileController {
   })
   async uploadAvatar(
     @User() user: UserType,
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 1 }),
-          new FileTypeValidator({ fileType: 'image/*' }),
-        ],
-      }),
-    )
+    @UploadedFile(avatarFileValidationPipe)
     file: Express.Multer.File,
   ) {
     const profile = await this.profileService.uploadAvatar(user._id, file);

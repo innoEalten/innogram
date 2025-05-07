@@ -7,14 +7,18 @@ import {
   Param,
   Delete,
   UseGuards,
-  Req,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { AuthGuard } from '../auth/guards/jwt.guard';
-import { ApiBearerAuth } from '@nestjs/swagger';
-import { RequestWithUser } from '../auth/interfaces/req-user.interface';
+import { ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
+import { User } from '../auth/decorators/user.decorator';
+import { User as UserType } from '@app/shared';
+import { postImagesFileValidationPipe } from './pipes/post-images-validation.pipe';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('post')
 @UseGuards(AuthGuard)
@@ -23,8 +27,15 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Post()
-  create(@Body() createPostDto: CreatePostDto, @Req() req: RequestWithUser) {
-    return this.postService.create(createPostDto, req.user._id);
+  @UseInterceptors(FilesInterceptor('files', 5))
+  @ApiConsumes('multipart/form-data')
+  create(
+    @Body() createPostDto: CreatePostDto,
+    @User() user: UserType,
+    @UploadedFiles(postImagesFileValidationPipe)
+    files: Express.Multer.File[],
+  ) {
+    return this.postService.create(createPostDto, user._id, files);
   }
 
   @Get()

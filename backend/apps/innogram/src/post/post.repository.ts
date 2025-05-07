@@ -7,9 +7,14 @@ import { UpdatePostDto } from './dto/update-post.dto';
 export class PostRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(data: CreatePostWithAuthorDto) {
+  create(data: CreatePostWithAuthorDto, images: string[]) {
     return this.prisma.post.create({
-      data,
+      data: {
+        ...data,
+        images: {
+          connect: images.map((id) => ({ id })),
+        },
+      },
     });
   }
 

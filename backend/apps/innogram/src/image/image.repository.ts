@@ -14,9 +14,9 @@ export class ImageRepository {
     });
   }
 
-  async create(file_id: string) {
+  async create(fileId: string, postId?: string) {
     return this.prisma.image.create({
-      data: { file_id },
+      data: { file_id: fileId, post_id: postId },
     });
   }
 

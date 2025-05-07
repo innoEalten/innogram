@@ -5,7 +5,6 @@ import {
   MaxFileSizeValidator,
   ParseFilePipe,
   Post,
-  Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -13,8 +12,9 @@ import {
 import { ProfileService } from './profile.service';
 import { AuthGuard } from '../auth/guards/jwt.guard';
 import { ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
-import { RequestWithUser } from '../auth/dto/req-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { User } from '../auth/decorators/user.decorator';
+import { User as UserType } from '@app/shared';
 
 @UseGuards(AuthGuard)
 @ApiBearerAuth()
@@ -23,8 +23,8 @@ export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
   @Get()
-  async getProfile(@Req() req: RequestWithUser) {
-    return this.profileService.getProfile(req.user._id);
+  async getProfile(@User() user: UserType) {
+    return this.profileService.getProfile(user._id);
   }
 
   @Post()
@@ -42,7 +42,7 @@ export class ProfileController {
     },
   })
   async uploadAvatar(
-    @Req() req: RequestWithUser,
+    @User() user: UserType,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -53,7 +53,7 @@ export class ProfileController {
     )
     file: Express.Multer.File,
   ) {
-    const profile = await this.profileService.uploadAvatar(req.user._id, file);
+    const profile = await this.profileService.uploadAvatar(user._id, file);
 
     return profile;
   }

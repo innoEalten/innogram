@@ -14,7 +14,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { AuthGuard } from '../auth/guards/jwt.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { RequestWithUser } from '../auth/dto/req-user.dto';
+import { RequestWithUser } from '../auth/interfaces/req-user.interface';
 
 @Controller('post')
 @UseGuards(AuthGuard)

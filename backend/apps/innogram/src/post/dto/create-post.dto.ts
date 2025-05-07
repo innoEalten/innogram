@@ -10,3 +10,7 @@ export class CreatePostDto {
   @IsString()
   body: string;
 }
+
+export type CreatePostWithAuthorDto = CreatePostDto & {
+  author_id: string;
+};

@@ -1,35 +1,24 @@
-import { PrismaService } from '@app/prisma';
 import { Injectable } from '@nestjs/common';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ImageService } from '../image/image.service';
 import { FileSubdirectory } from '../file/enum/file.enum';
 import { ProfileNotFoundException } from './exeptions/profileNotFound.exeption';
+import { ProfileRepository } from './profile.repository';
 
 @Injectable()
 export class ProfileService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly profileRepository: ProfileRepository,
     private readonly imageService: ImageService,
   ) {}
 
   async createProfile(data: CreateProfileDto) {
-    return await this.prisma.profile.create({
-      data,
-    });
+    return await this.profileRepository.create(data);
   }
 
   async getProfile(id: string) {
-    const profile = await this.prisma.profile.findUnique({
-      where: { user_id: id },
-      include: {
-        image: {
-          include: {
-            file: true,
-          },
-        },
-      },
-    });
+    const profile = await this.profileRepository.findOne(id);
 
     if (!profile) {
       throw new ProfileNotFoundException();
@@ -60,10 +49,10 @@ export class ProfileService {
   }
 
   async updateProfile(id: string, data: UpdateProfileDto) {
-    return await this.prisma.profile.update({ where: { user_id: id }, data });
+    return await this.profileRepository.update(id, data);
   }
 
   async deleteProfile(id: string) {
-    return await this.prisma.profile.delete({ where: { user_id: id } });
+    return await this.profileRepository.delete(id);
   }
 }

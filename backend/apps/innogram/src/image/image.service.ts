@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@app/prisma/prisma.service';
 import { FileService } from '../file/file.service';
 import { FileSubdirectory } from '../file/enum/file.enum';
 import { ImageNotFoundException } from './exeptions/imageNotFound.exeption';
+import { ImageRepository } from './image.repository';
 
 @Injectable()
 export class ImageService {
   constructor(
-    private readonly prisma: PrismaService,
     private readonly fileService: FileService,
+    private readonly imageRepository: ImageRepository,
   ) {}
 
   async uploadImage(
@@ -22,22 +22,17 @@ export class ImageService {
       subdirectory,
     );
 
-    return this.prisma.image.create({
-      data: { file_id: uploaded_file.id },
-    });
+    return this.imageRepository.create(uploaded_file.id);
   }
 
-  async deleteImage(image_id: string) {
-    const image = await this.prisma.image.findUnique({
-      where: { id: image_id },
-      include: { file: true },
-    });
+  async deleteImage(id: string) {
+    const image = await this.imageRepository.findOne(id);
 
     if (!image) {
       throw new ImageNotFoundException();
     }
 
-    await this.prisma.image.delete({ where: { id: image_id } });
+    await this.imageRepository.delete(id);
     await this.fileService.deleteFile(image.file_id);
   }
 }

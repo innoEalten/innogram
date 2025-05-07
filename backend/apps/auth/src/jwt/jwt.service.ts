@@ -1,7 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService as NestJwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { TokenPayload } from './interfaces/token-payload.interface';
+import { InvalidCredentialsException } from '../user/exeptions/invalidCredentials.exeption';
 @Injectable()
 export class JwtService {
   private readonly accessTokenExpiresIn: number;
@@ -64,7 +65,7 @@ export class JwtService {
         secret: this.accessTokenSecret,
       });
     } catch {
-      throw new UnauthorizedException('Invalid access token');
+      throw new InvalidCredentialsException();
     }
   }
 
@@ -74,7 +75,7 @@ export class JwtService {
         secret: this.refreshTokenSecret,
       });
     } catch {
-      throw new UnauthorizedException('Invalid refresh token');
+      throw new InvalidCredentialsException();
     }
   }
 }

@@ -9,19 +9,19 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() registerUserDto: CreateUserDto) {
-    return await this.authService.register(registerUserDto);
+    return this.authService.register(registerUserDto);
   }
 
   @Post('login')
   @HttpCode(200)
   async login(@Body() loginUserDto: LoginUserDto) {
-    return await this.authService.login(loginUserDto);
+    return this.authService.login(loginUserDto);
   }
 
   @Post('validate-token')
   @HttpCode(200)
   @ApiBearerAuth()
-  validateAccessToken(@Headers('Authorization') authorization: string) {
+  async validateAccessToken(@Headers('Authorization') authorization: string) {
     const token = authorization?.replace('Bearer ', '');
 
     return this.authService.validateAccessToken(token);
@@ -30,7 +30,7 @@ export class AuthController {
   @Post('logout')
   @HttpCode(200)
   @ApiBearerAuth()
-  logout(@Headers('Authorization') authorization: string) {
+  async logout(@Headers('Authorization') authorization: string) {
     const token = authorization?.replace('Bearer ', '');
 
     return this.authService.logout(token);

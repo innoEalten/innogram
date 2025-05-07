@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { JwtService } from './jwt.service';
 import { JwtModule as NestJwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { jwtConfig } from './config/jwt.config';
 
 @Module({
   imports: [
@@ -9,12 +10,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     NestJwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get('JWT_ACCESS_SECRET'),
-        signOptions: {
-          expiresIn: `${configService.get('JWT_ACCESS_EXPIRATION_TIME')}s`,
-        },
-      }),
+      useFactory: jwtConfig,
     }),
   ],
   providers: [JwtService],

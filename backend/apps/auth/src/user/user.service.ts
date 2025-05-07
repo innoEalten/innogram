@@ -73,7 +73,7 @@ export class UserService {
   }
 
   async setRefreshToken(userId: string, refreshToken: string, expiresAt: Date) {
-    return this.userModel.findByIdAndUpdate(
+    return await this.userModel.findByIdAndUpdate(
       userId,
       {
         refreshToken: {
@@ -86,7 +86,7 @@ export class UserService {
   }
 
   async deleteRefreshToken(userId: string) {
-    return this.userModel.findByIdAndUpdate(
+    return await this.userModel.findByIdAndUpdate(
       userId,
       { refreshToken: null },
       { new: true },

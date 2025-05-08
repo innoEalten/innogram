@@ -5,11 +5,11 @@ import { HttpModule } from '@nestjs/axios';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './exceptions/http-exception.filter';
 import { PrismaModule } from '@app/prisma';
-import { ProfileModule } from '../profile/profile.module';
 import { JwtModule } from '../jwt/jwt.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
-  imports: [HttpModule, PrismaModule, ProfileModule, JwtModule],
+  imports: [HttpModule, PrismaModule, EventEmitterModule.forRoot(), JwtModule],
   controllers: [AuthController],
   providers: [
     AuthService,

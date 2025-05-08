@@ -45,6 +45,6 @@ model Image {
   post_id String? @map("postId")
 
   profile Profile?
-  post    Post?    @relation(fields: [post_id], references: [id])
-  file    File    @relation(fields: [file_id], references: [id])
+  post    Post?    @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  file    File    @relation(fields: [file_id], references: [id], onDelete: Cascade)
 }

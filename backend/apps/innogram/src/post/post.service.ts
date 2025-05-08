@@ -4,6 +4,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { PostRepository } from './post.repository';
 import { ImageService } from '../image/image.service';
 import { FileSubdirectory } from '../file/enum/file.enum';
+import { PostNotFoundException } from './exeptions/post-not-found.exeption';
 
 @Injectable()
 export class PostService {
@@ -53,6 +54,20 @@ export class PostService {
   }
 
   async remove(id: string) {
+    const post = await this.postRepository.findOne(id);
+
+    if (!post) {
+      throw new PostNotFoundException();
+    }
+
+    if (post.images instanceof Array) {
+      for (const image of post.images) {
+        const img = image as { id: string };
+
+        await this.imageService.deleteImage(img.id);
+      }
+    }
+
     return this.postRepository.delete(id);
   }
 }

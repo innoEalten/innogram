@@ -25,6 +25,13 @@ export class PostRepository {
   findOne(id: string) {
     return this.prisma.post.findUnique({
       where: { id },
+      include: {
+        images: {
+          include: {
+            file: true,
+          },
+        },
+      },
     });
   }
 

@@ -33,7 +33,6 @@ export class ImageService {
       throw new ImageNotFoundException();
     }
 
-    await this.imageRepository.delete(id);
     await this.fileService.deleteFile(image.file_id);
   }
 }

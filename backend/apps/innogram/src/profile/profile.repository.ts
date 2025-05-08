@@ -9,7 +9,7 @@ export class ProfileRepository {
 
   async findOne(id: string) {
     return this.prisma.profile.findUnique({
-      where: { user_id: id },
+      where: { userId: id },
       include: {
         image: {
           include: {
@@ -25,10 +25,10 @@ export class ProfileRepository {
   }
 
   async update(id: string, data: UpdateProfileDto) {
-    return this.prisma.profile.update({ where: { user_id: id }, data });
+    return this.prisma.profile.update({ where: { userId: id }, data });
   }
 
   async delete(id: string) {
-    return this.prisma.profile.delete({ where: { user_id: id } });
+    return this.prisma.profile.delete({ where: { userId: id } });
   }
 }

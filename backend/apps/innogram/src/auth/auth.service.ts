@@ -35,7 +35,7 @@ export class AuthService {
     );
 
     const profile = await this.profileService.createProfile({
-      user_id: user._id,
+      userId: user._id,
       name: createUserDto.name,
       phone: createUserDto.phone,
       bio: '',

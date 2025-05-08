@@ -30,7 +30,7 @@ export class ProfileService {
   async uploadAvatar(id: string, file: Express.Multer.File) {
     const profile = await this.getProfile(id);
 
-    const filename = `${profile.user_id}-${Date.now()}-${file.originalname}`;
+    const filename = `${profile.userId}-${Date.now()}-${file.originalname}`;
     const imageEntity = await this.imageService.uploadImage(
       file,
       filename,
@@ -38,11 +38,11 @@ export class ProfileService {
     );
 
     const updatedProfile = await this.updateProfile(id, {
-      image_id: imageEntity.id,
+      imageId: imageEntity.id,
     });
 
-    if (profile.image_id) {
-      await this.imageService.deleteImage(profile.image_id);
+    if (profile.imageId) {
+      await this.imageService.deleteImage(profile.imageId);
     }
 
     return updatedProfile;

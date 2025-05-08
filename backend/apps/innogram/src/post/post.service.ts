@@ -15,13 +15,13 @@ export class PostService {
 
   async create(
     createPostDto: CreatePostDto,
-    user_id: string,
+    userId: string,
     files: Express.Multer.File[],
   ) {
     const images = [];
 
     for (const file of files) {
-      const filename = `${user_id}-${Date.now()}-${file.originalname}`;
+      const filename = `${userId}-${Date.now()}-${file.originalname}`;
 
       const image = await this.imageService.uploadImage(
         file,
@@ -35,7 +35,7 @@ export class PostService {
     return this.postRepository.create(
       {
         ...createPostDto,
-        author_id: user_id,
+        authorId: userId,
       },
       images.map((image) => image.id),
     );

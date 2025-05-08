@@ -16,7 +16,7 @@ export class ImageRepository {
 
   async create(fileId: string, postId?: string) {
     return this.prisma.image.create({
-      data: { file_id: fileId, post_id: postId },
+      data: { fileId, postId },
     });
   }
 

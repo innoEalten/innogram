@@ -15,15 +15,15 @@ export class ImageService {
     file: Express.Multer.File,
     filename: string,
     subdirectory?: FileSubdirectory,
-    post_id?: string,
+    postId?: string,
   ) {
-    const uploaded_file = await this.fileService.uploadFile(
+    const uploadedFile = await this.fileService.uploadFile(
       file,
       filename,
       subdirectory,
     );
 
-    return this.imageRepository.create(uploaded_file.id, post_id);
+    return this.imageRepository.create(uploadedFile.id, postId);
   }
 
   async deleteImage(id: string) {
@@ -33,6 +33,6 @@ export class ImageService {
       throw new ImageNotFoundException();
     }
 
-    await this.fileService.deleteFile(image.file_id);
+    await this.fileService.deleteFile(image.fileId);
   }
 }

@@ -8,28 +8,28 @@ datasource db {
 }
 
 model Profile {
-  user_id String @id
+  userId String @id @map("user_id")
   name    String
   phone   String
   bio     String
   posts   Post[]
 
-  image_id String? @unique @map("imageId")
-  image    Image?  @relation(fields: [image_id], references: [id])
+  imageId String? @unique @map("image_id")
+  image   Image?  @relation(fields: [imageId], references: [id])
 
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now()) @updatedAt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
 }
 
 model Post {
   id         String   @id @default(uuid())
   title      String
   body       String
-  created_at DateTime @default(now()) @map("createdAt")
-  author_id  String  @map("authorId")
+  createdAt DateTime @default(now()) @map("created_at")
+  authorId  String  @map("author_id") 
 
   images Image[]
-  author Profile @relation(fields: [author_id], references: [user_id])
+  author Profile @relation(fields: [authorId], references: [userId])
 }
 
 model File {
@@ -41,10 +41,10 @@ model File {
 
 model Image {
   id      String  @id @default(uuid())
-  file_id String @unique @map("fileId")
-  post_id String? @map("postId")
+  fileId String @unique @map("file_id")
+  postId String? @map("post_id")
 
   profile Profile?
-  post    Post?    @relation(fields: [post_id], references: [id], onDelete: Cascade)
-  file    File    @relation(fields: [file_id], references: [id], onDelete: Cascade)
+  post    Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  file    File    @relation(fields: [fileId], references: [id], onDelete: Cascade)
 }

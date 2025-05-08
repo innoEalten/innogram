@@ -40,8 +40,8 @@ export class FileService {
     return this.fileRepository.create(this._bucketName, filePath);
   }
 
-  async deleteFile(file_id: string) {
-    const file = await this.fileRepository.findOne(file_id);
+  async deleteFile(fileId: string) {
+    const file = await this.fileRepository.findOne(fileId);
 
     if (!file) {
       throw new FileNotFoundException();
@@ -51,6 +51,6 @@ export class FileService {
       this._bucketName,
       this.getObjectPath(file.url),
     );
-    await this.fileRepository.delete(file_id);
+    await this.fileRepository.delete(fileId);
   }
 }

@@ -23,5 +23,5 @@ export class CreatePostDto {
 }
 
 export type CreatePostWithAuthorDto = CreatePostDto & {
-  author_id: string;
+  authorId: string;
 };

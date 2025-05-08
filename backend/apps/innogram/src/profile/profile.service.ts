@@ -37,7 +37,7 @@ export class ProfileService {
       FileSubdirectory.AVATARS,
     );
 
-    const updatedProfile = await this.updateProfile(id, {
+    const updatedProfile = await this.profileRepository.update(id, {
       imageId: imageEntity.id,
     });
 

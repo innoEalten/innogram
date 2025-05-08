@@ -24,7 +24,7 @@ export class ProfileRepository {
     return this.prisma.profile.create({ data });
   }
 
-  async update(id: string, data: UpdateProfileDto) {
+  async update(id: string, data: UpdateProfileDto & { imageId?: string }) {
     return this.prisma.profile.update({ where: { userId: id }, data });
   }
 

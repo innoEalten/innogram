@@ -1,7 +1,9 @@
 import {
   Controller,
   Get,
+  Patch,
   Post,
+  Body,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -13,6 +15,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { User } from '../auth/decorators/user.decorator';
 import { User as UserType } from '@app/shared';
 import { avatarFileValidationPipe } from './pipes/avatar-file-validation.pipe';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @UseGuards(AuthGuard)
 @ApiBearerAuth()
@@ -47,5 +50,13 @@ export class ProfileController {
     const profile = await this.profileService.uploadAvatar(user._id, file);
 
     return profile;
+  }
+
+  @Patch()
+  async updateProfile(
+    @User() user: UserType,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    return this.profileService.updateProfile(user._id, updateProfileDto);
   }
 }

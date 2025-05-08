@@ -1,15 +1,15 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { HttpModule } from '@nestjs/axios';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './exceptions/http-exception.filter';
-import { JwtStrategy } from './strategies/jwt.strategy';
 import { PrismaModule } from '@app/prisma';
 import { ProfileModule } from '../profile/profile.module';
+import { JwtModule } from '../jwt/jwt.module';
 
 @Module({
-  imports: [HttpModule, PrismaModule, forwardRef(() => ProfileModule)],
+  imports: [HttpModule, PrismaModule, ProfileModule, JwtModule],
   controllers: [AuthController],
   providers: [
     AuthService,
@@ -17,8 +17,6 @@ import { ProfileModule } from '../profile/profile.module';
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
     },
-    JwtStrategy,
   ],
-  exports: [JwtStrategy],
 })
 export class AuthModule {}

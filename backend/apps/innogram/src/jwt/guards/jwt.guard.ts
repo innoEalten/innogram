@@ -1,16 +1,12 @@
-import {
-  Injectable,
-  CanActivate,
-  ExecutionContext,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtStrategy } from '../strategies/jwt.strategy';
 import { Reflector } from '@nestjs/core';
-import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+import { IS_PUBLIC_KEY } from '../../auth/decorators/public.decorator';
+import { InvalidTokenException } from '../exeptions/invalid-token.exeption';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class JwtGuard implements CanActivate {
   constructor(
     private readonly jwtStrategy: JwtStrategy,
     private readonly reflector: Reflector,
@@ -37,12 +33,12 @@ export class AuthGuard implements CanActivate {
   private extractTokenFromHeader(req: Request): string {
     const authHeader = req.headers['authorization'];
     if (!authHeader) {
-      throw new UnauthorizedException();
+      throw new InvalidTokenException();
     }
 
     const [type, token] = authHeader.split(' ');
     if (type !== 'Bearer' || !token) {
-      throw new UnauthorizedException();
+      throw new InvalidTokenException();
     }
 
     return token;

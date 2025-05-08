@@ -9,7 +9,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ProfileService } from './profile.service';
-import { AuthGuard } from '../auth/guards/jwt.guard';
+import { JwtGuard } from '../jwt/guards/jwt.guard';
 import { ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { User } from '../auth/decorators/user.decorator';
@@ -17,7 +17,7 @@ import { User as UserType } from '@app/shared';
 import { avatarFileValidationPipe } from './pipes/avatar-file-validation.pipe';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 
-@UseGuards(AuthGuard)
+@UseGuards(JwtGuard)
 @ApiBearerAuth()
 @Controller('profile')
 export class ProfileController {

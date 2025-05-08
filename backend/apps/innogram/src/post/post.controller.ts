@@ -13,7 +13,7 @@ import {
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { AuthGuard } from '../auth/guards/jwt.guard';
+import { JwtGuard } from '../jwt/guards/jwt.guard';
 import { ApiBearerAuth, ApiConsumes } from '@nestjs/swagger';
 import { User } from '../auth/decorators/user.decorator';
 import { User as UserType } from '@app/shared';
@@ -21,7 +21,7 @@ import { postImagesFileValidationPipe } from './pipes/post-images-validation.pip
 import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('post')
-@UseGuards(AuthGuard)
+@UseGuards(JwtGuard)
 @ApiBearerAuth()
 export class PostController {
   constructor(private readonly postService: PostService) {}

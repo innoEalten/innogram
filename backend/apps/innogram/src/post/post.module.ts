@@ -5,9 +5,10 @@ import { AuthModule } from '../auth/auth.module';
 import { PrismaModule } from '@app/prisma';
 import { ImageModule } from '../image/image.module';
 import { PostRepository } from './post.repository';
+import { JwtModule } from '../jwt/jwt.module';
 
 @Module({
-  imports: [AuthModule, PrismaModule, ImageModule],
+  imports: [AuthModule, PrismaModule, ImageModule, JwtModule],
   controllers: [PostController],
   providers: [PostService, PostRepository],
 })

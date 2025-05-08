@@ -1,8 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { ValidateTokenResponseDto } from '@app/shared/dto/auth-response.dto';
+import { InvalidTokenException } from '../exeptions/invalid-token.exeption';
 
 @Injectable()
 export class JwtStrategy {
@@ -30,7 +31,7 @@ export class JwtStrategy {
     );
 
     if (!data) {
-      throw new UnauthorizedException();
+      throw new InvalidTokenException();
     }
 
     return data;

@@ -1,13 +1,13 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { PrismaModule } from '@app/prisma';
 import { ProfileController } from './profile.controller';
 import { ImageModule } from '../image/image.module';
-import { AuthModule } from '../auth/auth.module';
 import { ProfileRepository } from './profile.repository';
+import { JwtModule } from '../jwt/jwt.module';
 
 @Module({
-  imports: [PrismaModule, ImageModule, forwardRef(() => AuthModule)],
+  imports: [PrismaModule, ImageModule, JwtModule],
   providers: [ProfileService, ProfileRepository],
   exports: [ProfileService],
   controllers: [ProfileController],

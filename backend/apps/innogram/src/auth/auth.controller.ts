@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginUserDto, CreateUserDto, RefreshTokenDto } from '@app/shared';
-import { AuthGuard } from './guards/jwt.guard';
+import { JwtGuard } from '../jwt/guards/jwt.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('auth')
@@ -27,7 +27,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtGuard)
   @ApiBearerAuth()
   @HttpCode(200)
   logout(@Headers('Authorization') authorization: string) {

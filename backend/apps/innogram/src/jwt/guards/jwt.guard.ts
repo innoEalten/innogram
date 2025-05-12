@@ -4,6 +4,7 @@ import { JwtStrategy } from '../strategies/jwt.strategy';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../../auth/decorators/public.decorator';
 import { InvalidTokenException } from '../exeptions/invalid-token.exeption';
+import { RequestWithUser } from '../../auth/interfaces/req-user.interface';
 
 @Injectable()
 export class JwtGuard implements CanActivate {
@@ -22,7 +23,7 @@ export class JwtGuard implements CanActivate {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest<Request>();
+    const request = context.switchToHttp().getRequest<RequestWithUser>();
     const token = this.extractTokenFromHeader(request);
 
     const user = await this.jwtStrategy.validateRequest(token);

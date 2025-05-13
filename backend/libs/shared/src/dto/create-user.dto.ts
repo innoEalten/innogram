@@ -1,26 +1,21 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsEmail,
-  IsPhoneNumber,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
+import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
+import { Transform } from 'class-transformer';
+import * as bcrypt from 'bcryptjs';
+
+export class CreateTransformedUserDto {
+  email: string;
+
+  @Transform(({ value }) => bcrypt.hashSync(value as string, 10), {
+    toClassOnly: true,
+  })
+  password: string;
+}
 
 export class CreateUserDto {
   @ApiProperty({ default: 'user@example.com' })
   @IsEmail()
   email: string;
-
-  @ApiProperty({ default: 'John Doe' })
-  @IsString()
-  @MinLength(2)
-  @MaxLength(32)
-  name: string;
-
-  @ApiProperty({ default: '+375291234567' })
-  @IsPhoneNumber()
-  phone: string;
 
   @ApiProperty({ default: 'stringst' })
   @IsString()

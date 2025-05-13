@@ -7,7 +7,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginUserDto, CreateUserDto, RefreshTokenDto } from '@app/shared';
+import {
+  LoginUserDto,
+  CreateUserWithProfileDto,
+  RefreshTokenDto,
+} from '@app/shared';
 import { AuthGuard } from './guards/jwt.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
@@ -16,7 +20,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  async register(@Body() registerUserDto: CreateUserDto) {
+  async register(@Body() registerUserDto: CreateUserWithProfileDto) {
     return await this.authService.register(registerUserDto);
   }
 

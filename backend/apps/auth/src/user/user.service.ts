@@ -1,27 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto } from '../../../../libs/shared/src/dto/create-user.dto';
 import { UserNotFoundException } from './exceptions/user-not-found.exception';
 import { UserWithEmailExistsException } from './exceptions/user-with-email-exists.exception';
 import * as bcrypt from 'bcryptjs';
 import { VerifyPasswordDto } from './dto/verify-password.dto';
 import { InvalidCredentialsException } from './exceptions/invalid-credentials.exception';
-import { User, UserDocument } from '../schemas/user.schema';
-import { Model } from 'mongoose';
-import { InjectModel } from '@nestjs/mongoose';
 import { MongoServerError } from 'mongodb';
+import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
   async create(createUserDto: CreateUserDto) {
-    const hashedPass = await bcrypt.hash(createUserDto.password, 10);
-
     try {
-      const user = await this.userModel.create({
-        email: createUserDto.email,
-        password: hashedPass,
-      });
+      console.log(createUserDto);
+      const user = await this.userRepository.create(createUserDto);
 
       return user;
     } catch (err) {
@@ -34,11 +28,11 @@ export class UserService {
   }
 
   async findAll() {
-    return this.userModel.find();
+    return this.userRepository.findAll();
   }
 
   async findOneById(id: string) {
-    const user = await this.userModel.findById(id);
+    const user = await this.userRepository.findOneById(id);
 
     if (!user) {
       throw new UserNotFoundException();
@@ -48,13 +42,9 @@ export class UserService {
   }
 
   async comparePassword(verifyPasswordDto: VerifyPasswordDto) {
-    if (!verifyPasswordDto.email || !verifyPasswordDto.password) {
-      throw new InvalidCredentialsException();
-    }
-
-    const user = await this.userModel.findOne({
-      email: verifyPasswordDto.email,
-    });
+    const user = await this.userRepository.findOneByEmail(
+      verifyPasswordDto.email,
+    );
 
     if (!user) {
       throw new InvalidCredentialsException();
@@ -73,23 +63,10 @@ export class UserService {
   }
 
   async setRefreshToken(userId: string, refreshToken: string, expiresAt: Date) {
-    return await this.userModel.findByIdAndUpdate(
-      userId,
-      {
-        refreshToken: {
-          token: refreshToken,
-          expiresAt: expiresAt,
-        },
-      },
-      { new: true },
-    );
+    return this.userRepository.setRefreshToken(userId, refreshToken, expiresAt);
   }
 
   async deleteRefreshToken(userId: string) {
-    return await this.userModel.findByIdAndUpdate(
-      userId,
-      { refreshToken: null },
-      { new: true },
-    );
+    return this.userRepository.deleteRefreshToken(userId);
   }
 }

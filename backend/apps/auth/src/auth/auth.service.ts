@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto, LoginUserDto } from '@app/shared';
+import { LoginUserDto } from '@app/shared';
 import { UserService } from '../user/user.service';
 import { JwtService } from '../jwt/jwt.service';
 import { plainToClass } from 'class-transformer';
 import { UserResponseDto } from './dto/user-response.dto';
 import { InvalidCredentialsException } from '../user/exceptions/invalid-credentials.exception';
+import { CreateTransformedUserDto } from '@app/shared/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -13,8 +14,10 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(createUserDto: CreateUserDto) {
-    const user = await this.userService.create(createUserDto);
+  async register(createUserDto: CreateTransformedUserDto) {
+    const user = await this.userService.create(
+      plainToClass(CreateTransformedUserDto, createUserDto),
+    );
 
     const tokens = {
       access: this.jwtService.signAccessToken(user._id.toString()),

@@ -1,4 +1,4 @@
-export * from './dto/create-user.dto';
+export * from './dto/create-user-with-profile.dto';
 export * from './dto/login-user.dto';
 export * from './dto/refresh-token.dto';
 export * from './dto/auth-response.dto';

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {
-  CreateUserDto,
+  CreateUserWithProfileDto,
   LoginUserDto,
   RegisterResponseDto,
   LogoutResponseDto,
@@ -11,6 +11,7 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
 import { ProfileService } from '../profile/profile.service';
+import { CreateUserDto } from '@app/shared/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -24,18 +25,23 @@ export class AuthService {
       this.configService.getOrThrow<string>('AUTH_SERVICE_URL');
   }
 
-  async register(createUserDto: CreateUserDto) {
+  async register(createUserDto: CreateUserWithProfileDto) {
+    const user: CreateUserDto = {
+      email: createUserDto.email,
+      password: createUserDto.password,
+    };
+
     const {
-      data: { user, tokens },
+      data: { user: createdUser, tokens },
     } = await firstValueFrom(
       this.httpService.post<RegisterResponseDto>(
         `${this.authServiceUrl}/register`,
-        createUserDto,
+        user,
       ),
     );
 
     const profile = await this.profileService.createProfile({
-      userId: user._id,
+      userId: createdUser._id,
       name: createUserDto.name,
       phone: createUserDto.phone,
       bio: '',

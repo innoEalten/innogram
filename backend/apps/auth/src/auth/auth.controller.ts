@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { LoginUserDto } from '@app/shared';
 import { RefreshTokenDto } from '@app/shared/dto/refresh-token.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { CreateUserDto } from '../../../../libs/shared/src/dto/create-user.dto';
+import { CreateUserDto } from '@app/shared/dto/create-user.dto';
 @Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -25,7 +25,9 @@ export class AuthController {
   async validateAccessToken(@Headers('Authorization') authorization: string) {
     const token = authorization?.replace('Bearer ', '');
 
-    return this.authService.validateAccessToken(token);
+    const userId = await this.authService.validateAccessToken(token);
+
+    return this.authService.getUserById(userId);
   }
 
   @Post('logout')

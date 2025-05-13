@@ -5,24 +5,28 @@ import { TokenPayload } from './interfaces/token-payload.interface';
 import { InvalidCredentialsException } from '../user/exceptions/invalid-credentials.exception';
 @Injectable()
 export class JwtService {
-  private readonly accessTokenExpiresIn: number;
+  private readonly accessTokenExpiresIn: string;
+  private readonly accessTokenExpiresInSeconds: number;
   private readonly accessTokenSecret: string;
-  private readonly refreshTokenExpiresIn: number;
+  private readonly refreshTokenExpiresIn: string;
+  private readonly refreshTokenExpiresInSeconds: number;
   private readonly refreshTokenSecret: string;
 
   constructor(
     private readonly jwtNestService: NestJwtService,
     private readonly configService: ConfigService,
   ) {
-    this.accessTokenExpiresIn = parseInt(
+    this.accessTokenExpiresInSeconds = parseInt(
       this.configService.getOrThrow<string>('JWT_ACCESS_EXPIRATION_TIME'),
     );
+    this.accessTokenExpiresIn = `${this.accessTokenExpiresInSeconds}s`;
     this.accessTokenSecret =
       this.configService.getOrThrow<string>('JWT_ACCESS_SECRET');
 
-    this.refreshTokenExpiresIn = parseInt(
+    this.refreshTokenExpiresInSeconds = parseInt(
       this.configService.getOrThrow<string>('JWT_REFRESH_EXPIRATION_TIME'),
     );
+    this.refreshTokenExpiresIn = `${this.refreshTokenExpiresInSeconds}s`;
     this.refreshTokenSecret =
       this.configService.getOrThrow<string>('JWT_REFRESH_SECRET');
   }
@@ -36,12 +40,12 @@ export class JwtService {
 
     const token = this.jwtNestService.sign(payload, {
       secret: this.accessTokenSecret,
-      expiresIn: `${this.accessTokenExpiresIn}s`,
+      expiresIn: this.accessTokenExpiresIn,
     });
 
     return {
       token,
-      expiresAt: this.calculateExpiresAt(this.accessTokenExpiresIn),
+      expiresAt: this.calculateExpiresAt(this.accessTokenExpiresInSeconds),
     };
   }
 
@@ -50,12 +54,12 @@ export class JwtService {
 
     const token = this.jwtNestService.sign(payload, {
       secret: this.refreshTokenSecret,
-      expiresIn: `${this.refreshTokenExpiresIn}s`,
+      expiresIn: this.refreshTokenExpiresIn,
     });
 
     return {
       token,
-      expiresAt: this.calculateExpiresAt(this.refreshTokenExpiresIn),
+      expiresAt: this.calculateExpiresAt(this.refreshTokenExpiresInSeconds),
     };
   }
 

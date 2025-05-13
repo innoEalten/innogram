@@ -85,6 +85,16 @@ export class AuthService {
       this.jwtService.validateAccessToken(accessToken).sub,
     );
 
+    if (!user) {
+      throw new InvalidCredentialsException();
+    }
+
+    return user._id.toString();
+  }
+
+  async getUserById(userId: string) {
+    const user = await this.userService.findOneById(userId);
+
     return plainToClass(
       UserResponseDto,
       {

@@ -31,7 +31,7 @@ export class JwtGuard implements CanActivate {
     return true;
   }
 
-  private extractTokenFromHeader(req: Request): string {
+  extractTokenFromHeader(req: Request) {
     const authHeader = req.headers['authorization'];
     if (!authHeader) {
       throw new InvalidTokenException();

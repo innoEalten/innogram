@@ -8,6 +8,7 @@ import { FileModule } from './file/file.module';
 import { MinioModule } from './minio/minio.module';
 import { ImageModule } from './image/image.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ChatModule } from './chat/chat.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -24,6 +25,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     MinioModule,
     FileModule,
     ImageModule,
+    ChatModule,
   ],
   controllers: [],
   providers: [],

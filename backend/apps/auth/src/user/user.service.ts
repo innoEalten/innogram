@@ -4,7 +4,6 @@ import { UserNotFoundException } from './exceptions/user-not-found.exception';
 import { UserWithEmailExistsException } from './exceptions/user-with-email-exists.exception';
 import * as bcrypt from 'bcryptjs';
 import { VerifyPasswordDto } from './dto/verify-password.dto';
-import { InvalidCredentialsException } from './exceptions/invalid-credentials.exception';
 import { MongoServerError } from 'mongodb';
 import { UserRepository } from './user.repository';
 
@@ -40,25 +39,26 @@ export class UserService {
     return user;
   }
 
+  async findOneByEmail(email: string) {
+    const user = await this.userRepository.findOneByEmail(email);
+
+    if (!user) {
+      throw new UserNotFoundException();
+    }
+
+    return user;
+  }
+
   async comparePassword(verifyPasswordDto: VerifyPasswordDto) {
     const user = await this.userRepository.findOneByEmail(
       verifyPasswordDto.email,
     );
 
     if (!user) {
-      throw new InvalidCredentialsException();
+      return false;
     }
 
-    const isPasswordCorrect = await bcrypt.compare(
-      verifyPasswordDto.password,
-      user.password,
-    );
-
-    if (!isPasswordCorrect) {
-      throw new InvalidCredentialsException();
-    }
-
-    return user;
+    return await bcrypt.compare(verifyPasswordDto.password, user.password);
   }
 
   async setRefreshToken(userId: string, refreshToken: string, expiresAt: Date) {

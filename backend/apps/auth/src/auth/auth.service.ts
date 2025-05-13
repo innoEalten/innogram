@@ -46,7 +46,14 @@ export class AuthService {
   }
 
   async login(loginUserDto: LoginUserDto) {
-    const user = await this.userService.comparePassword(loginUserDto);
+    const isPasswordCorrect =
+      await this.userService.comparePassword(loginUserDto);
+
+    if (!isPasswordCorrect) {
+      throw new InvalidCredentialsException();
+    }
+
+    const user = await this.userService.findOneByEmail(loginUserDto.email);
 
     const tokens = {
       access: this.jwtService.signAccessToken(user._id.toString()),

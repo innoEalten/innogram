@@ -14,7 +14,7 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto) {
     try {
-      console.log(createUserDto);
+
       const user = await this.userRepository.create(createUserDto);
 
       return user;

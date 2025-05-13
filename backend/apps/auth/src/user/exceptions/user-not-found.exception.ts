@@ -1,7 +1,8 @@
+import { USER_ERROR_MESSAGES } from '@app/shared/constants/user.constraints';
 import { NotFoundException } from '@nestjs/common';
 
 export class UserNotFoundException extends NotFoundException {
   constructor() {
-    super('User not found');
+    super(USER_ERROR_MESSAGES.USER_NOT_FOUND);
   }
 }

@@ -4,7 +4,7 @@ import { UserService } from '../user/user.service';
 import { JwtService } from '../jwt/jwt.service';
 import { plainToClass } from 'class-transformer';
 import { UserResponseDto } from './dto/user-response.dto';
-import { InvalidCredentialsException } from '../user/exeptions/invalidCredentials.exeption';
+import { InvalidCredentialsException } from '../user/exceptions/invalid-credentials.exception';
 
 @Injectable()
 export class AuthService {

@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UserNotFoundException } from './exeptions/userNotFound.exeption';
-import { UserWithEmailExistsException } from './exeptions/userWithEmailExists';
+import { UserNotFoundException } from './exceptions/user-not-found.exception';
+import { UserWithEmailExistsException } from './exceptions/user-with-email-exists.exception';
 import * as bcrypt from 'bcryptjs';
 import { VerifyPasswordDto } from './dto/verify-password.dto';
-import { InvalidCredentialsException } from './exeptions/invalidCredentials.exeption';
+import { InvalidCredentialsException } from './exceptions/invalid-credentials.exception';
 import { User, UserDocument } from '../schemas/user.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';

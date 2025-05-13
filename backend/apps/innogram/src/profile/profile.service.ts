@@ -8,20 +8,20 @@ export class ProfileService {
   constructor(private readonly prisma: PrismaService) {}
 
   async createProfile(data: CreateProfileDto) {
-    return await this.prisma.profile.create({
+    return this.prisma.profile.create({
       data,
     });
   }
 
   async getProfile(id: string) {
-    return await this.prisma.profile.findUnique({ where: { user_id: id } });
+    return this.prisma.profile.findUnique({ where: { userId: id } });
   }
 
   async updateProfile(id: string, data: UpdateProfileDto) {
-    return await this.prisma.profile.update({ where: { user_id: id }, data });
+    return this.prisma.profile.update({ where: { userId: id }, data });
   }
 
   async deleteProfile(id: string) {
-    return await this.prisma.profile.delete({ where: { user_id: id } });
+    return this.prisma.profile.delete({ where: { userId: id } });
   }
 }

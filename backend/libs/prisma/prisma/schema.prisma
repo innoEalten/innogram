@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Profile {
-  user_id         String          @id
+  userId         String          @id @map("user_id")
   name            String          
   phone           String
   bio             String

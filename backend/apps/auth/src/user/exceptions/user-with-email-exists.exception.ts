@@ -1,7 +1,8 @@
 import { ConflictException } from '@nestjs/common';
+import { USER_ERROR_MESSAGES } from '@app/shared';
 
 export class UserWithEmailExistsException extends ConflictException {
   constructor() {
-    super('User with this email already exists');
+    super(USER_ERROR_MESSAGES.USER_WITH_EMAIL_EXISTS);
   }
 }

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService as NestJwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { TokenPayload } from './interfaces/token-payload.interface';
-import { InvalidCredentialsException } from '../user/exeptions/invalidCredentials.exeption';
+import { InvalidCredentialsException } from '../user/exceptions/invalid-credentials.exception';
 @Injectable()
 export class JwtService {
   private readonly accessTokenExpiresIn: number;

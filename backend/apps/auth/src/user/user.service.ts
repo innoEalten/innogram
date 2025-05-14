@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from '../../../../libs/shared/src/dto/create-user.dto';
+import { CreateUserDto } from '@app/shared/dto/create-user.dto';
 import { UserNotFoundException } from './exceptions/user-not-found.exception';
 import { UserWithEmailExistsException } from './exceptions/user-with-email-exists.exception';
 import * as bcrypt from 'bcryptjs';

@@ -1,3 +1,5 @@
+import { AUTH_ERROR_MESSAGES } from '@app/shared';
+import { ErrorResponse } from '@app/shared/interfaces/error-response.interface';
 import {
   ExceptionFilter,
   Catch,
@@ -7,32 +9,21 @@ import {
 import { AxiosError } from 'axios';
 import { Response } from 'express';
 
-interface ErrorResponse {
-  message?: string;
-  error?: string;
-}
-
 @Catch(AxiosError)
 export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: AxiosError, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    if (exception.response) {
-      const status = exception.response.status;
-      const data = exception.response.data as ErrorResponse;
+    const status =
+      exception.response?.status || HttpStatus.INTERNAL_SERVER_ERROR;
+    const { error, message = AUTH_ERROR_MESSAGES.INTERNAL_SERVER_ERROR } =
+      exception.response?.data as ErrorResponse;
 
-      response.status(status).json({
-        statusCode: status,
-        message: data.message || 'An error occurred',
-        error: data.error || 'Internal Server Error',
-      });
-    } else {
-      response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: 'Internal server error',
-        error: 'Internal Server Error',
-      });
-    }
+    response.status(status).json({
+      statusCode: status,
+      message: message,
+      ...(error && { error }),
+    });
   }
 }

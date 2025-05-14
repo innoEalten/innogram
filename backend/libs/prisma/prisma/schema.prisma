@@ -8,43 +8,11 @@ datasource db {
 }
 
 model Profile {
-  userId String @id @map("user_id")
-  name    String
-  phone   String
-  bio     String
-  posts   Post[]
+  userId         String          @id @map("user_id")
+  name            String          
+  phone           String
+  bio             String
 
-  imageId String? @unique @map("image_id")
-  image   Image?  @relation(fields: [imageId], references: [id])
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
-}
-
-model Post {
-  id         String   @id @default(uuid())
-  title      String
-  body       String
-  createdAt DateTime @default(now()) @map("created_at")
-  authorId  String  @map("author_id") 
-
-  images Image[]
-  author Profile @relation(fields: [authorId], references: [userId])
-}
-
-model File {
-  id  String @id @default(uuid())
-  url String
-
-  image Image?
-}
-
-model Image {
-  id      String  @id @default(uuid())
-  fileId String @unique @map("file_id")
-  postId String? @map("post_id")
-
-  profile Profile?
-  post    Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
-  file    File    @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @updatedAt @default(now())
 }

@@ -1,8 +1,9 @@
 import { Body, Controller, HttpCode, Post, Headers } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto, LoginUserDto } from '@app/shared';
-import { RefreshTokenDto } from '../../../../libs/shared/src/dto/refresh-token.dto';
+import { LoginUserDto } from '@app/shared';
+import { RefreshTokenDto } from '@app/shared/dto/refresh-token.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { CreateUserDto } from '@app/shared/dto/create-user.dto';
 @Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -24,7 +25,9 @@ export class AuthController {
   async validateAccessToken(@Headers('Authorization') authorization: string) {
     const token = authorization?.replace('Bearer ', '');
 
-    return this.authService.validateAccessToken(token);
+    const userId = await this.authService.validateAccessToken(token);
+
+    return this.authService.getUserById(userId);
   }
 
   @Post('logout')

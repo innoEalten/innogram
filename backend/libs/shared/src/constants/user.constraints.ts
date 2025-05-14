@@ -1,0 +1,4 @@
+export const USER_ERROR_MESSAGES = {
+  USER_WITH_EMAIL_EXISTS: 'User with this email already exists',
+  USER_NOT_FOUND: 'User not found',
+};

@@ -6,7 +6,7 @@ import {
   SubscribeMessage,
   ConnectedSocket,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { WsAuthGuard } from '../jwt/guards/ws-jwt.guard';
 import { WsInvalidTokenException } from '../jwt/exeptions/invalid-token.exeption';
 import { JwtStrategy } from '../jwt/strategies/jwt.strategy';
@@ -38,8 +38,13 @@ export class ChatGateway {
 
   @SubscribeMessage('send_message')
   @UseGuards(WsAuthGuard)
-  handleMessage(@MessageBody() message: string) {
+  handleMessage(
+    @MessageBody() message: string,
+    @ConnectedSocket() client: Socket,
+  ) {
     this.logger.log(message);
-    this.server.emit('receive_message', message);
+    client.broadcast.emit('receive_message', message);
+
+    return message;
   }
 }

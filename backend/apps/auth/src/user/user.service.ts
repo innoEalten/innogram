@@ -58,7 +58,7 @@ export class UserService {
       return false;
     }
 
-    return await bcrypt.compare(verifyPasswordDto.password, user.password);
+    return bcrypt.compare(verifyPasswordDto.password, user.password);
   }
 
   async setRefreshToken(userId: string, refreshToken: string, expiresAt: Date) {

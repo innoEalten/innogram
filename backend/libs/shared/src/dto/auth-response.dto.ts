@@ -11,7 +11,7 @@ export interface Tokens {
   refresh: Token;
 }
 
-interface Token {
+export interface Token {
   token: string;
   expiresAt: string;
 }

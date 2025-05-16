@@ -24,7 +24,6 @@ export class AuthController {
   @ApiBearerAuth()
   async validateAccessToken(@Headers('Authorization') authorization: string) {
     const token = authorization?.replace('Bearer ', '');
-
     const userId = await this.authService.validateAccessToken(token);
 
     return this.authService.getUserById(userId);
@@ -35,8 +34,9 @@ export class AuthController {
   @ApiBearerAuth()
   async logout(@Headers('Authorization') authorization: string) {
     const token = authorization?.replace('Bearer ', '');
+    const userId = await this.authService.validateAccessToken(token);
 
-    return this.authService.logout(token);
+    return this.authService.logout(userId);
   }
 
   @Post('refresh-access-token')

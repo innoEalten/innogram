@@ -1,5 +1,4 @@
 import { AUTH_ERROR_MESSAGES } from '@app/shared';
-import { ErrorResponse } from '@app/shared/interfaces/error-response.interface';
 import {
   ExceptionFilter,
   Catch,
@@ -17,12 +16,25 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     const status =
       exception.response?.status || HttpStatus.INTERNAL_SERVER_ERROR;
-    const { error, message = AUTH_ERROR_MESSAGES.INTERNAL_SERVER_ERROR } =
-      exception.response?.data as ErrorResponse;
+
+    const data = exception.response?.data;
+
+    let message = AUTH_ERROR_MESSAGES.INTERNAL_SERVER_ERROR;
+    let error: string | undefined;
+
+    if (data && typeof data === 'object') {
+      if ('message' in data && typeof data.message === 'string') {
+        message = data.message;
+      }
+
+      if ('error' in data && typeof data.error === 'string') {
+        error = data.error;
+      }
+    }
 
     response.status(status).json({
       statusCode: status,
-      message: message,
+      message,
       ...(error && { error }),
     });
   }

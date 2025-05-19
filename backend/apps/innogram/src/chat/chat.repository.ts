@@ -16,6 +16,12 @@ export class ChatRepository {
     });
   }
 
+  async getChatById(chatId: string) {
+    return this.prisma.chat.findUnique({
+      where: { id: chatId },
+    });
+  }
+
   async createChat(initiatorId: string, recipientId: string) {
     return this.prisma.chat.create({
       data: { initiatorId, recipientId },

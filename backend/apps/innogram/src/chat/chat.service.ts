@@ -17,6 +17,15 @@ export class ChatService {
     return chat;
   }
 
+  async getValidatedUserChat(chatId: string, userId: string) {
+    const chat = await this.chatRepository.getChatById(chatId);
+
+    if (!chat || (chat.initiatorId !== userId && chat.recipientId !== userId))
+      return;
+
+    return chat;
+  }
+
   async createMessage(chatId: string, senderId: string, content: string) {
     return this.chatRepository.createMessage(chatId, senderId, content);
   }

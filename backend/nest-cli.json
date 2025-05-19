@@ -19,7 +19,7 @@
         "tsConfigPath": "apps/auth/tsconfig.app.json"
       }
     },
-    "backend": {
+    "innogram": {
       "type": "application",
       "root": "apps/innogram",
       "entryFile": "main",
@@ -35,6 +35,15 @@
       "sourceRoot": "libs/prisma/src",
       "compilerOptions": {
         "tsConfigPath": "libs/prisma/tsconfig.lib.json"
+      }
+    },
+    "shared": {
+      "type": "library",
+      "root": "libs/shared",
+      "entryFile": "index",
+      "sourceRoot": "libs/shared/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/shared/tsconfig.lib.json"
       }
     }
   }

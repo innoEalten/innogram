@@ -44,7 +44,6 @@ export class AuthService {
       userId: createdUser._id,
       name: createUserDto.name,
       phone: createUserDto.phone,
-      bio: '',
     });
 
     return { user, profile, tokens };

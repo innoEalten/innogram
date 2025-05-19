@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 
 const getAccessTokenExpirationTime = (configService: ConfigService) =>
-  `${configService.get('JWT_ACCESS_EXPIRATION_TIME')}s`;
+  `${configService.getOrThrow('JWT_ACCESS_EXPIRATION_TIME')}s`;
 
 export const jwtConfig = (configService: ConfigService) => ({
   secret: configService.getOrThrow<string>('JWT_ACCESS_SECRET'),

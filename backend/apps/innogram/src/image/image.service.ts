@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { FileService } from '../file/file.service';
 import { FileSubdirectory } from '../file/enum/file.enum';
-import { ImageNotFoundException } from './exeptions/imageNotFound.exeption';
 import { ImageRepository } from './image.repository';
+import { type Image } from '@app/shared';
 
 @Injectable()
 export class ImageService {
@@ -11,28 +11,34 @@ export class ImageService {
     private readonly imageRepository: ImageRepository,
   ) {}
 
-  async uploadImage(
-    file: Express.Multer.File,
-    filename: string,
-    subdirectory?: FileSubdirectory,
+  async uploadImages(
+    files: Express.Multer.File[],
+    subdirectory: FileSubdirectory,
     postId?: string,
   ) {
-    const uploadedFile = await this.fileService.uploadFile(
-      file,
-      filename,
+    const uploadedFiles = await this.fileService.uploadFiles(
+      files,
       subdirectory,
     );
 
-    return this.imageRepository.create(uploadedFile.id, postId);
+    return this.imageRepository.createMany(
+      uploadedFiles.map((file) => ({
+        fileId: file.id,
+        postId,
+      })),
+    );
   }
 
-  async deleteImage(id: string) {
-    const image = await this.imageRepository.findOne(id);
+  deleteImages(images: Image[]) {
+    const imageIds = images.map((image) => image.id);
+    const filesToDelete = images.map((image) => ({
+      id: image.fileId,
+      url: image.file.url,
+    }));
 
-    if (!image) {
-      throw new ImageNotFoundException();
-    }
-
-    await this.fileService.deleteFile(image.fileId);
+    return Promise.all([
+      this.fileService.deleteFiles(filesToDelete),
+      this.imageRepository.deleteMany(imageIds),
+    ]);
   }
 }

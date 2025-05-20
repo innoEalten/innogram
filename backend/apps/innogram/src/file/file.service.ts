@@ -1,56 +1,71 @@
 import { Injectable } from '@nestjs/common';
 import { Client } from 'minio';
 import { InjectMinio } from '../minio/minio.decorator';
-import { PrismaService } from '@app/prisma';
 import { FileSubdirectory } from './enum/file.enum';
 import { ConfigService } from '@nestjs/config';
-import { FileNotFoundException } from './exeptions/fileNotFound.exeption';
 import { FileRepository } from './file.repository';
 
 @Injectable()
 export class FileService {
   protected readonly _bucketName: string;
+  protected readonly _publicUrl: string;
 
   constructor(
     @InjectMinio() private readonly minioService: Client,
-    private readonly prisma: PrismaService,
     private readonly configService: ConfigService,
     private readonly fileRepository: FileRepository,
   ) {
     this._bucketName =
       this.configService.getOrThrow<string>('MINIO_BUCKET_NAME');
+    this._publicUrl = this.configService.getOrThrow<string>('MINIO_PUBLIC_URL');
   }
 
   private getObjectPath(path: string): string {
     const parts = path.split('/');
-    const relevantParts = parts.filter(Boolean).slice(1);
+    const relevantParts = parts.filter(Boolean).slice(3);
 
     return relevantParts.join('/');
   }
 
-  async uploadFile(
-    file: Express.Multer.File,
-    filename: string,
-    subdirectory?: FileSubdirectory,
+  async uploadFiles(
+    files: Express.Multer.File[],
+    subdirectory: FileSubdirectory,
   ) {
-    const filePath = subdirectory ? `${subdirectory}/${filename}` : filename;
+    const now = Date.now();
 
-    await this.minioService.putObject(this._bucketName, filePath, file.buffer);
+    const urls = await Promise.all(
+      files.map(async (file, index) => {
+        const filename = `${now}-${index}-${file.originalname}`;
+        const filePath = `${subdirectory}/${filename}`;
 
-    return this.fileRepository.create(this._bucketName, filePath);
+        await this.minioService.putObject(
+          this._bucketName,
+          filePath,
+          file.buffer,
+          file.size,
+          {
+            'Content-Type': file.mimetype,
+          },
+        );
+
+        return `${this._publicUrl}/${this._bucketName}/${filePath}`;
+      }),
+    );
+
+    const fileEntities = urls.map((url) => ({ url }));
+    return this.fileRepository.createMany(fileEntities);
   }
 
-  async deleteFile(fileId: string) {
-    const file = await this.fileRepository.findOne(fileId);
-
-    if (!file) {
-      throw new FileNotFoundException();
-    }
-
-    await this.minioService.removeObject(
-      this._bucketName,
-      this.getObjectPath(file.url),
+  async deleteFiles(files: { id: string; url: string }[]) {
+    await Promise.all(
+      files.map(({ url }) => {
+        this.minioService.removeObject(
+          this._bucketName,
+          this.getObjectPath(url),
+        );
+      }),
     );
-    await this.fileRepository.delete(fileId);
+
+    return this.fileRepository.deleteMany(files.map((file) => file.id));
   }
 }

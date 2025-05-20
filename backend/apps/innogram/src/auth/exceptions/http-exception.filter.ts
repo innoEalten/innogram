@@ -1,5 +1,5 @@
 import { AUTH_ERROR_MESSAGES } from '@app/shared';
-import { ErrorResponse } from '@app/shared/interfaces/error-response.interface';
+import { ErrorResponse } from '@app/shared/interfaces';
 import {
   ExceptionFilter,
   Catch,

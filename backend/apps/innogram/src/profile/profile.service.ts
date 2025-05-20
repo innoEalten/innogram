@@ -30,19 +30,21 @@ export class ProfileService {
   async uploadAvatar(id: string, file: Express.Multer.File) {
     const profile = await this.getProfile(id);
 
-    const filename = `${profile.userId}-${Date.now()}-${file.originalname}`;
-    const imageEntity = await this.imageService.uploadImage(
-      file,
-      filename,
+    const [imageEntity] = await this.imageService.uploadImages(
+      [file],
       FileSubdirectory.AVATARS,
     );
+
+    if (!imageEntity) {
+      throw new Error('Failed to upload image');
+    }
 
     const updatedProfile = await this.profileRepository.update(id, {
       imageId: imageEntity.id,
     });
 
-    if (profile.imageId) {
-      await this.imageService.deleteImage(profile.imageId);
+    if (profile.image) {
+      await this.imageService.deleteImages([profile.image]);
     }
 
     return updatedProfile;

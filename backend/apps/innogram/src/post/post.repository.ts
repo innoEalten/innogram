@@ -1,29 +1,42 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@app/prisma';
-import { CreatePostWithAuthorDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
+import { CreatePostWithAuthorDto, UpdatePostDto, UUIDParamDto } from './dto';
 
 @Injectable()
 export class PostRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(data: CreatePostWithAuthorDto, images: string[]) {
-    return this.prisma.post.create({
-      data: {
-        ...data,
-        images: {
-          connect: images.map((id) => ({ id })),
-        },
-      },
+  create(data: CreatePostWithAuthorDto) {
+    const prisma = this.prisma.getClient();
+
+    return prisma.post.create({
+      data,
     });
   }
 
-  findAll() {
-    return this.prisma.post.findMany();
+  findManyWithTotal(pagination: { skip: number; take: number }) {
+    return this.prisma.$transaction([
+      this.prisma.post.findMany({
+        ...pagination,
+        include: {
+          images: {
+            include: {
+              file: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+      this.prisma.post.count(),
+    ]);
   }
 
-  findOne(id: string) {
-    return this.prisma.post.findUnique({
+  findOne(id: UUIDParamDto['id']) {
+    const prisma = this.prisma.getClient();
+
+    return prisma.post.findUnique({
       where: { id },
       include: {
         images: {
@@ -35,15 +48,19 @@ export class PostRepository {
     });
   }
 
-  update(id: string, data: UpdatePostDto) {
-    return this.prisma.post.update({
+  update(id: UUIDParamDto['id'], data: UpdatePostDto) {
+    const prisma = this.prisma.getClient();
+
+    return prisma.post.update({
       where: { id },
       data,
     });
   }
 
-  delete(id: string) {
-    return this.prisma.post.delete({
+  delete(id: UUIDParamDto['id']) {
+    const prisma = this.prisma.getClient();
+
+    return prisma.post.delete({
       where: { id },
     });
   }

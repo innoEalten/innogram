@@ -5,24 +5,17 @@ import { Injectable } from '@nestjs/common';
 export class ImageRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findOne(id: string) {
-    return this.prisma.image.findUnique({
-      where: { id },
-      include: {
-        file: true,
-      },
-    });
+  createMany(data: { fileId: string; postId?: string }[]) {
+    const prisma = this.prisma.getClient();
+
+    return prisma.image.createManyAndReturn({ data });
   }
 
-  async create(fileId: string, postId?: string) {
-    return this.prisma.image.create({
-      data: { fileId, postId },
-    });
-  }
+  deleteMany(ids: string[]) {
+    const prisma = this.prisma.getClient();
 
-  async delete(id: string) {
-    return this.prisma.image.delete({
-      where: { id },
+    return prisma.image.deleteMany({
+      where: { id: { in: ids } },
     });
   }
 }

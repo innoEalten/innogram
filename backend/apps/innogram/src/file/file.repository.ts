@@ -5,23 +5,21 @@ import { Injectable } from '@nestjs/common';
 export class FileRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findOne(id: string) {
-    return this.prisma.file.findUnique({
-      where: { id },
-    });
+  createMany(data: { url: string }[]) {
+    const prisma = this.prisma.getClient();
+
+    return prisma.file.createManyAndReturn({ data });
   }
 
-  async create(bucketName: string, filePath: string) {
-    return this.prisma.file.create({
-      data: {
-        url: `/${bucketName}/${filePath}`,
+  deleteMany(ids: string[]) {
+    const prisma = this.prisma.getClient();
+
+    return prisma.file.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
       },
-    });
-  }
-
-  async delete(id: string) {
-    return this.prisma.file.delete({
-      where: { id },
     });
   }
 }

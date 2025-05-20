@@ -4,7 +4,7 @@ import { JwtStrategy } from '../strategies/jwt.strategy';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../../auth/decorators/public.decorator';
 import { InvalidTokenException } from '../exeptions/invalid-token.exeption';
-import { RequestWithUser } from '../../auth/interfaces/req-user.interface';
+import { RequestWithUser } from '@app/shared';
 
 @Injectable()
 export class JwtGuard implements CanActivate {

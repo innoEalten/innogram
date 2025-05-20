@@ -1,5 +1,6 @@
-import * as Joi from 'joi';
+import { IsString } from 'class-validator';
 
-export const sendMessageSchema = Joi.object({
-  message: Joi.string().required(),
-});
+export class SendMessageDto {
+  @IsString()
+  message: string;
+}

@@ -40,4 +40,16 @@ export class ChatRepository {
       orderBy: { createdAt: 'asc' },
     });
   }
+
+  async getChats(userId: string) {
+    return this.prisma.chat.findMany({
+      where: { OR: [{ initiatorId: userId }, { recipientId: userId }] },
+      include: {
+        messages: {
+          orderBy: { createdAt: 'asc' },
+          take: 1,
+        },
+      },
+    });
+  }
 }

@@ -1,7 +1,3 @@
-import { Prisma } from '@prisma/client';
+import { PostWithImages } from './post-with-images';
 
-export type Image = Prisma.ImageGetPayload<{
-  include: {
-    file: true;
-  };
-}>;
+export type Image = PostWithImages['images'][number];

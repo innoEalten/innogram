@@ -24,14 +24,13 @@ import {
   ApiConsumes,
   ApiTags,
   ApiOperation,
-  ApiBody,
   ApiResponse,
-  ApiParam,
 } from '@nestjs/swagger';
 import { User } from '../auth/decorators/user.decorator';
 import type { User as UserType } from '@app/shared';
 import { postImagesFileValidationPipe } from './pipes/post-images-validation.pipe';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { uploadPostForm } from './decorators/upload-post-form.decorator';
 
 @Controller('posts')
 @UseGuards(JwtGuard)
@@ -41,19 +40,16 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Post()
-  @UseInterceptors(FilesInterceptor('files', 5))
+  @ApiOperation({ summary: 'Create a new post' })
   @ApiConsumes('multipart/form-data')
-  @ApiOperation({ summary: 'Create a new post with optional images' })
-  @ApiBody({
-    description: 'Form data including post fields and files',
-    type: CreatePostDto,
-  })
   @ApiResponse({ status: 201, description: 'Post created successfully' })
+  @uploadPostForm
+  @UseInterceptors(FilesInterceptor('files', 5))
   create(
     @Body() createPostDto: CreatePostDto,
     @User() { _id }: UserType,
     @UploadedFiles(postImagesFileValidationPipe)
-    files?: Express.Multer.File[],
+    files: Express.Multer.File[],
   ) {
     return this.postService.create(createPostDto, _id, files);
   }
@@ -70,11 +66,6 @@ export class PostController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a single post by ID' })
-  @ApiParam({
-    name: 'id',
-    description: 'Unique identifier of the post (UUID)',
-    type: String,
-  })
   @ApiResponse({
     status: 200,
     description: 'Post returned successfully',
@@ -85,11 +76,6 @@ export class PostController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a post (optionally replace/add images)' })
-  @ApiParam({ name: 'id', type: 'string', description: 'Post ID (UUID)' })
-  @ApiBody({
-    description: 'Partial post fields and optional images',
-    type: UpdatePostDto,
-  })
   @ApiResponse({ status: 200, description: 'Post updated successfully' })
   update(
     @Param() { id: postId }: UUIDParamDto,
@@ -101,11 +87,6 @@ export class PostController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a post by ID' })
-  @ApiParam({
-    name: 'id',
-    description: 'Unique identifier of the post (UUID)',
-    type: String,
-  })
   @ApiResponse({
     status: 200,
     description: 'Post deleted successfully',

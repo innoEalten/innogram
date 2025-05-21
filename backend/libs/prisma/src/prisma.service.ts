@@ -42,7 +42,7 @@ export class PrismaService
 
   getClient(): PrismaClient | Prisma.TransactionClient {
     const store = this.asyncLocalStorage.getStore();
-    if (store && store.tx) return store.tx;
+    if (store?.tx) return store.tx;
     return this;
   }
 }

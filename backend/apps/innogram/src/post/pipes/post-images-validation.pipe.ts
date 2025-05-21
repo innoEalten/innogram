@@ -9,5 +9,5 @@ export const postImagesFileValidationPipe = new ParseFilePipe({
     new MaxFileSizeValidator({ maxSize: 1024 * 1024 * 5 }),
     new FileTypeValidator({ fileType: 'image/*' }),
   ],
-  fileIsRequired: false,
+  fileIsRequired: true,
 });

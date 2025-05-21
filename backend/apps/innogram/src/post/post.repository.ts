@@ -7,9 +7,7 @@ export class PostRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   create(data: CreatePostWithAuthorDto) {
-    const prisma = this.prisma.getClient();
-
-    return prisma.post.create({
+    return this.prisma.getClient().post.create({
       data,
     });
   }
@@ -18,10 +16,26 @@ export class PostRepository {
     return this.prisma.$transaction([
       this.prisma.post.findMany({
         ...pagination,
-        include: {
+        select: {
+          id: true,
+          title: true,
+          body: true,
+          createdAt: true,
+          author: {
+            select: {
+              userId: true,
+              name: true,
+            },
+          },
           images: {
-            include: {
-              file: true,
+            select: {
+              id: true,
+              file: {
+                select: {
+                  id: true,
+                  url: true,
+                },
+              },
             },
           },
         },
@@ -34,14 +48,28 @@ export class PostRepository {
   }
 
   findOne(id: UUIDParamDto['id']) {
-    const prisma = this.prisma.getClient();
-
-    return prisma.post.findUnique({
+    return this.prisma.getClient().post.findUnique({
       where: { id },
-      include: {
+      select: {
+        id: true,
+        title: true,
+        body: true,
+        createdAt: true,
+        author: {
+          select: {
+            userId: true,
+            name: true,
+          },
+        },
         images: {
-          include: {
-            file: true,
+          select: {
+            id: true,
+            file: {
+              select: {
+                id: true,
+                url: true,
+              },
+            },
           },
         },
       },
@@ -49,18 +77,14 @@ export class PostRepository {
   }
 
   update(id: UUIDParamDto['id'], data: UpdatePostDto) {
-    const prisma = this.prisma.getClient();
-
-    return prisma.post.update({
+    return this.prisma.getClient().post.update({
       where: { id },
       data,
     });
   }
 
   delete(id: UUIDParamDto['id']) {
-    const prisma = this.prisma.getClient();
-
-    return prisma.post.delete({
+    return this.prisma.getClient().post.delete({
       where: { id },
     });
   }

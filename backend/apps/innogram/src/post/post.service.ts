@@ -32,7 +32,7 @@ export class PostService {
   create(
     createPostDto: CreatePostDto,
     userId: User['_id'],
-    files?: Express.Multer.File[],
+    files: Express.Multer.File[],
   ) {
     return this.prisma.runInTransaction(async () => {
       const newPost = await this.postRepository.create({
@@ -40,7 +40,7 @@ export class PostService {
         authorId: userId,
       });
 
-      if (files && files.length > 0) {
+      if (files.length > 0) {
         await this.imageService.uploadImages(
           files,
           FileSubdirectory.POSTS,
@@ -97,7 +97,7 @@ export class PostService {
   ) {
     return this.prisma.runInTransaction(async () => {
       const post = await this.findOne(postId);
-      PostService.validatePostOwnership(post.authorId, userId);
+      PostService.validatePostOwnership(post.author.userId, userId);
 
       return this.postRepository.update(postId, updatePostDto);
     });
@@ -106,7 +106,7 @@ export class PostService {
   delete(postId: UUIDParamDto['id'], userId: User['_id']) {
     return this.prisma.runInTransaction(async () => {
       const post = await this.findOne(postId);
-      PostService.validatePostOwnership(post.authorId, userId);
+      PostService.validatePostOwnership(post.author.userId, userId);
 
       if (post.images && post.images.length > 0) {
         await this.imageService.deleteImages(post.images);

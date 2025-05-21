@@ -32,7 +32,7 @@ export class ImageService {
   deleteImages(images: Image[]) {
     const imageIds = images.map((image) => image.id);
     const filesToDelete = images.map((image) => ({
-      id: image.fileId,
+      id: image.file.id,
       url: image.file.url,
     }));
 

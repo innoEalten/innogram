@@ -34,14 +34,14 @@ export class ChatRepository {
     });
   }
 
-  async getMessages(chatId: string) {
+  async getChatMessages(chatId: string) {
     return this.prisma.message.findMany({
       where: { chatId },
       orderBy: { createdAt: 'asc' },
     });
   }
 
-  async getChats(userId: string) {
+  async getUserChats(userId: string) {
     return this.prisma.chat.findMany({
       where: { OR: [{ initiatorId: userId }, { recipientId: userId }] },
       include: {

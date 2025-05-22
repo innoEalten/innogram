@@ -30,11 +30,11 @@ export class ChatService {
     return this.chatRepository.createMessage(chatId, senderId, content);
   }
 
-  async getMessages(chatId: string) {
-    return this.chatRepository.getMessages(chatId);
+  async getChatMessages(chatId: string) {
+    return this.chatRepository.getChatMessages(chatId);
   }
 
-  async getChats(userId: string) {
-    return this.chatRepository.getChats(userId);
+  async getUserChats(userId: string) {
+    return this.chatRepository.getUserChats(userId);
   }
 }

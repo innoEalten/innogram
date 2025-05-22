@@ -18,12 +18,12 @@ export class ChatController {
   }
 
   @Get()
-  async getChats(@User() user: UserType) {
-    return this.chatService.getChats(user._id);
+  async getUserChats(@User() user: UserType) {
+    return this.chatService.getUserChats(user._id);
   }
 
   @Get('messages/:chatId')
-  async getMessages(@Param('chatId') chatId: string) {
-    return this.chatService.getMessages(chatId);
+  async getChatMessages(@Param('chatId') chatId: string) {
+    return this.chatService.getChatMessages(chatId);
   }
 }

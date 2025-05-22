@@ -1,4 +1,4 @@
-import { Logger, UseGuards, UsePipes } from '@nestjs/common';
+import { UseGuards, UsePipes } from '@nestjs/common';
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -26,12 +26,11 @@ export class ChatGateway {
   server: Server;
 
   constructor(
-    private readonly logger: Logger,
     private readonly jwtStrategy: JwtStrategy,
     private readonly chatService: ChatService,
   ) {}
 
-  afterInit(@ConnectedSocket() server: Server) {
+  afterInit(server: Server) {
     server.use((packet, next) => {
       const token = packet.handshake?.headers?.authorization?.split(' ')[1];
 
@@ -54,7 +53,6 @@ export class ChatGateway {
     @ConnectedSocket() client: Socket,
     @WsChat() chat: Chat,
   ) {
-    this.logger.log(`WsUser ${client.id} joined chat ${chat.id}`);
     return client.join(chat.id);
   }
 
@@ -62,13 +60,10 @@ export class ChatGateway {
   @UseGuards(ChatAccessGuard)
   @UsePipes(new WSValidationPipe())
   async handleMessage(
-    @ConnectedSocket() client: Socket,
     @MessageBody() { message }: SendMessageDto,
     @WsUser() user: UserType,
     @WsChat() chat: Chat,
   ) {
-    this.logger.log(`User ${user._id} sent message ${message}`);
-
     const createdMessage = await this.chatService.createMessage(
       chat.id,
       user._id,
@@ -76,6 +71,8 @@ export class ChatGateway {
     );
 
     this.server.to(chat.id).emit('receive_message', createdMessage);
+
+    this.server.emit('receive_message', 'CHECK!');
 
     return createdMessage;
   }

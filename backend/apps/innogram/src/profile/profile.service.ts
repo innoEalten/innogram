@@ -14,7 +14,7 @@ export class ProfileService {
   ) {}
 
   async createProfile(data: CreateProfileDto) {
-    return await this.profileRepository.create(data);
+    return this.profileRepository.create(data);
   }
 
   async getProfile(id: string) {
@@ -51,10 +51,10 @@ export class ProfileService {
   }
 
   async updateProfile(id: string, data: UpdateProfileDto) {
-    return await this.profileRepository.update(id, data);
+    return this.profileRepository.update(id, data);
   }
 
   async deleteProfile(id: string) {
-    return await this.profileRepository.delete(id);
+    return this.profileRepository.delete(id);
   }
 }

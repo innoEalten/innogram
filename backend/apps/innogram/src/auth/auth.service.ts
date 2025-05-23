@@ -45,12 +45,11 @@ export class AuthService {
       userId: createdUser._id,
       name: createUserDto.name,
       phone: createUserDto.phone,
-      bio: '',
     };
 
     this.eventEmitter.emit('user.created', profileData);
 
-    return { user, tokens };
+    return { user: createdUser, tokens };
   }
 
   async login(loginUserDto: LoginUserDto) {

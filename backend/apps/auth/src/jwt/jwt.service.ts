@@ -3,6 +3,9 @@ import { JwtService as NestJwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { TokenPayload } from './interfaces/token-payload.interface';
 import { InvalidCredentialsException } from '../user/exceptions/invalid-credentials.exception';
+
+const MILLISECONDS_IN_SECOND = 1000;
+
 @Injectable()
 export class JwtService {
   private readonly accessTokenExpiresIn: string;
@@ -32,7 +35,7 @@ export class JwtService {
   }
 
   private calculateExpiresAt(seconds: number): Date {
-    return new Date(Date.now() + seconds * 1000);
+    return new Date(Date.now() + seconds * MILLISECONDS_IN_SECOND);
   }
 
   signAccessToken(userId: string) {

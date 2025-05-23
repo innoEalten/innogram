@@ -6,6 +6,8 @@ import { plainToClass } from 'class-transformer';
 import { UserResponseDto } from './dto/user-response.dto';
 import { InvalidCredentialsException } from '../user/exceptions/invalid-credentials.exception';
 import { CreateTransformedUserDto } from '@app/shared/dto/create-user.dto';
+import * as bcrypt from 'bcryptjs';
+import { UserWithEmailExistsException } from '../user/exceptions/user-with-email-exists.exception';
 
 @Injectable()
 export class AuthService {
@@ -15,17 +17,25 @@ export class AuthService {
   ) {}
 
   async register(createUserDto: CreateTransformedUserDto) {
-    const user = await this.userService.create(
+    const existingUser = await this.userService.findOneByEmail(
+      createUserDto.email,
+    );
+
+    if (existingUser) {
+      throw new UserWithEmailExistsException();
+    }
+
+    const newUser = await this.userService.create(
       plainToClass(CreateTransformedUserDto, createUserDto),
     );
 
     const tokens = {
-      access: this.jwtService.signAccessToken(user._id.toString()),
-      refresh: this.jwtService.signRefreshToken(user._id.toString()),
+      access: this.jwtService.signAccessToken(newUser._id.toString()),
+      refresh: this.jwtService.signRefreshToken(newUser._id.toString()),
     };
 
     await this.userService.setRefreshToken(
-      user._id.toString(),
+      newUser._id.toString(),
       tokens.refresh.token,
       tokens.refresh.expiresAt,
     );
@@ -34,8 +44,8 @@ export class AuthService {
       user: plainToClass(
         UserResponseDto,
         {
-          ...user.toObject(),
-          _id: user._id.toString(),
+          ...newUser.toObject(),
+          _id: newUser._id.toString(),
         },
         {
           excludeExtraneousValues: true,
@@ -46,14 +56,20 @@ export class AuthService {
   }
 
   async login(loginUserDto: LoginUserDto) {
-    const isPasswordCorrect =
-      await this.userService.comparePassword(loginUserDto);
+    const user = await this.userService.findOneByEmail(loginUserDto.email);
+
+    if (!user) {
+      throw new InvalidCredentialsException();
+    }
+
+    const isPasswordCorrect = await this.comparePassword(
+      loginUserDto.password,
+      user.password,
+    );
 
     if (!isPasswordCorrect) {
       throw new InvalidCredentialsException();
     }
-
-    const user = await this.userService.findOneByEmail(loginUserDto.email);
 
     const tokens = {
       access: this.jwtService.signAccessToken(user._id.toString()),
@@ -81,9 +97,7 @@ export class AuthService {
     };
   }
 
-  async logout(token: string) {
-    const { sub: userId } = this.jwtService.validateAccessToken(token);
-
+  async logout(userId: string) {
     await this.userService.deleteRefreshToken(userId);
   }
 
@@ -136,5 +150,9 @@ export class AuthService {
     return {
       tokens,
     };
+  }
+
+  private async comparePassword(password: string, hashedPassword: string) {
+    return bcrypt.compare(password, hashedPassword);
   }
 }

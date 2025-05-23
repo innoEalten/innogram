@@ -1,10 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from '@app/shared/dto/create-user.dto';
 import { UserNotFoundException } from './exceptions/user-not-found.exception';
-import { UserWithEmailExistsException } from './exceptions/user-with-email-exists.exception';
-import * as bcrypt from 'bcryptjs';
-import { VerifyPasswordDto } from './dto/verify-password.dto';
-import { MongoServerError } from 'mongodb';
 import { UserRepository } from './user.repository';
 
 @Injectable()
@@ -12,17 +8,7 @@ export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
   async create(createUserDto: CreateUserDto) {
-    try {
-      const user = await this.userRepository.create(createUserDto);
-
-      return user;
-    } catch (err) {
-      if (err instanceof MongoServerError && err.code === 11000) {
-        throw new UserWithEmailExistsException();
-      }
-
-      throw err;
-    }
+    return this.userRepository.create(createUserDto);
   }
 
   async findAll() {
@@ -40,25 +26,7 @@ export class UserService {
   }
 
   async findOneByEmail(email: string) {
-    const user = await this.userRepository.findOneByEmail(email);
-
-    if (!user) {
-      throw new UserNotFoundException();
-    }
-
-    return user;
-  }
-
-  async comparePassword(verifyPasswordDto: VerifyPasswordDto) {
-    const user = await this.userRepository.findOneByEmail(
-      verifyPasswordDto.email,
-    );
-
-    if (!user) {
-      return false;
-    }
-
-    return await bcrypt.compare(verifyPasswordDto.password, user.password);
+    return this.userRepository.findOneByEmail(email);
   }
 
   async setRefreshToken(userId: string, refreshToken: string, expiresAt: Date) {

@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { HttpModule } from '@nestjs/axios';
 import { APP_FILTER } from '@nestjs/core';
-import { HttpExceptionFilter } from './exceptions/http-exception.filter';
+import { AxiosExceptionFilter } from './exceptions/axios-exception.filter';
 import { PrismaModule } from '@app/prisma';
 import { JwtModule } from '../jwt/jwt.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
@@ -15,7 +15,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     AuthService,
     {
       provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
+      useClass: AxiosExceptionFilter,
     },
   ],
 })

@@ -41,11 +41,10 @@ export class AuthService {
       ),
     );
 
-    const profileData: CreateProfileDto = {
-      userId: createdUser._id,
-      name: createUserDto.name,
-      phone: createUserDto.phone,
-    };
+    const profileData = new CreateProfileDto();
+    profileData.userId = createdUser._id;
+    profileData.name = createUserDto.name;
+    profileData.phone = createUserDto.phone;
 
     this.eventEmitter.emit('user.created', profileData);
 

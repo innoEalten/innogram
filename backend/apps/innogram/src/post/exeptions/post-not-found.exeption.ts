@@ -1,5 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
-import { POST_ERROR_MESSAGES } from '@app/shared/constants/post.constants';
+import { POST_ERROR_MESSAGES } from '@app/shared/constants';
 
 export class PostNotFoundException extends NotFoundException {
   constructor() {

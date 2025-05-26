@@ -13,7 +13,7 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { Response } from 'express';
 import { Cookies } from './decorators/cookie.decorator';
 import { JwtGuard } from '../jwt/guards/jwt.guard';
-import { CookieDto } from './dto/cookie.dto';
+import { RefreshTokenCookieDto } from './dto/refresh-token-cookie.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -74,7 +74,7 @@ export class AuthController {
   @HttpCode(200)
   async refreshAccessToken(
     @Res({ passthrough: true }) res: Response,
-    @Cookies('refreshToken') { cookie: refreshToken }: CookieDto,
+    @Cookies('refreshToken') { cookie: refreshToken }: RefreshTokenCookieDto,
   ) {
     const result = await this.authService.refreshAccessToken(refreshToken);
 

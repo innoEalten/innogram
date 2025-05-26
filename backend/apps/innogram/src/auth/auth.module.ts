@@ -6,10 +6,9 @@ import { APP_FILTER } from '@nestjs/core';
 import { AxiosExceptionFilter } from './exceptions/axios-exception.filter';
 import { PrismaModule } from '@app/prisma';
 import { JwtModule } from '../jwt/jwt.module';
-import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
-  imports: [HttpModule, PrismaModule, EventEmitterModule.forRoot(), JwtModule],
+  imports: [HttpModule, PrismaModule, JwtModule],
   controllers: [AuthController],
   providers: [
     AuthService,

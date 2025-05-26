@@ -7,12 +7,16 @@ import { PostModule } from './post/post.module';
 import { FileModule } from './file/file.module';
 import { MinioModule } from './minio/minio.module';
 import { ImageModule } from './image/image.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
       validationSchema,
+    }),
+    EventEmitterModule.forRoot({
+      global: true,
     }),
     AuthModule,
     ProfileModule,

@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class CookieDto {
+export class RefreshTokenCookieDto {
   @IsString()
   @IsNotEmpty()
   cookie: string;

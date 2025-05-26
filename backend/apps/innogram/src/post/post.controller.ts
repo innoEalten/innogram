@@ -32,6 +32,8 @@ import { postImagesFileValidationPipe } from './pipes/post-images-validation.pip
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { uploadPostForm } from './decorators/upload-post-form.decorator';
 
+const MAX_FILE_NUMBER = 5;
+
 @Controller('posts')
 @UseGuards(JwtGuard)
 @ApiBearerAuth()
@@ -44,7 +46,7 @@ export class PostController {
   @ApiConsumes('multipart/form-data')
   @ApiResponse({ status: 201, description: 'Post created successfully' })
   @uploadPostForm
-  @UseInterceptors(FilesInterceptor('files', 5))
+  @UseInterceptors(FilesInterceptor('files', MAX_FILE_NUMBER))
   create(
     @Body() createPostDto: CreatePostDto,
     @User() { _id }: UserType,

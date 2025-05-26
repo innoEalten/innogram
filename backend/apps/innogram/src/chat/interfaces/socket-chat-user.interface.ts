@@ -1,4 +1,4 @@
-import { SocketWithUser } from '../../auth/interfaces/socket-user.interface';
+import { SocketWithUser } from '@app/shared/interfaces/socket-user.interface';
 import { Chat } from '@prisma/client';
 
 export interface SocketWithChatUser extends SocketWithUser {

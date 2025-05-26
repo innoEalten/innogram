@@ -53,7 +53,7 @@ export class ChatGateway {
     @ConnectedSocket() client: Socket,
     @WsChat() chat: Chat,
   ) {
-    return client.join(chat.id);
+    return await client.join(chat.id);
   }
 
   @SubscribeMessage('send_message')
@@ -71,8 +71,6 @@ export class ChatGateway {
     );
 
     this.server.to(chat.id).emit('receive_message', createdMessage);
-
-    this.server.emit('receive_message', 'CHECK!');
 
     return createdMessage;
   }

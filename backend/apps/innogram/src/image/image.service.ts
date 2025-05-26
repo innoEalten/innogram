@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { FileService } from '../file/file.service';
-import { FileSubdirectory } from '../file/enum/file.enum';
+import { type Image, FileSubdirectory, hasItems } from '@app/shared';
 import { ImageRepository } from './image.repository';
-import { type Image } from '@app/shared';
 
 @Injectable()
 export class ImageService {
@@ -16,6 +15,10 @@ export class ImageService {
     subdirectory: FileSubdirectory,
     postId?: string,
   ) {
+    if (!hasItems(files)) {
+      return [];
+    }
+
     const uploadedFiles = await this.fileService.uploadFiles(
       files,
       subdirectory,
@@ -30,11 +33,12 @@ export class ImageService {
   }
 
   deleteImages(images: Image[]) {
+    if (!hasItems(images)) {
+      return Promise.resolve();
+    }
+
     const imageIds = images.map((image) => image.id);
-    const filesToDelete = images.map((image) => ({
-      id: image.file.id,
-      url: image.file.url,
-    }));
+    const filesToDelete = images.map((image) => image.file);
 
     return Promise.all([
       this.fileService.deleteFiles(filesToDelete),

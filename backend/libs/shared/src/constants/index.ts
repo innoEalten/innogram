@@ -1,3 +1,5 @@
 export * from './auth.constants';
-export * from './user.constraints';
-export * from './post.constraints';
+export * from './user.constants';
+export * from './post.constants';
+export * from './file.constants';
+export * from './profile.contants';

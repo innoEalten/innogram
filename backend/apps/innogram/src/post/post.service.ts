@@ -1,17 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import {
-  CreatePostDto,
-  UpdatePostDto,
-  UUIDParamDto,
-  PaginationQueryDto,
-} from './dto';
+import { CreatePostDto, UpdatePostDto, PaginationQueryDto } from './dto';
 import { PostRepository } from './post.repository';
 import { ImageService } from '../image/image.service';
-import { FileSubdirectory } from '../file/enum/file.enum';
 import { PostNotFoundException } from './exeptions';
-import type { User, PaginationResponse, Post } from '@app/shared';
+import type { PaginationResponse, Post } from '@app/shared';
+import { FileSubdirectory } from '@app/shared';
 import { PrismaService } from '@app/prisma';
-import { buildPaginationResponse } from './utils';
+import { buildPaginationResponse, getPaginationParams } from './utils';
 
 @Injectable()
 export class PostService {
@@ -23,7 +18,7 @@ export class PostService {
 
   create(
     createPostDto: CreatePostDto,
-    userId: User['_id'],
+    userId: string,
     files: Express.Multer.File[],
   ) {
     return this.prisma.runInTransaction(async () => {
@@ -32,13 +27,11 @@ export class PostService {
         authorId: userId,
       });
 
-      if (files.length > 0) {
-        await this.imageService.uploadImages(
-          files,
-          FileSubdirectory.POSTS,
-          newPost.id,
-        );
-      }
+      await this.imageService.uploadImages(
+        files,
+        FileSubdirectory.POSTS,
+        newPost.id,
+      );
 
       return newPost;
     });
@@ -48,10 +41,9 @@ export class PostService {
     page,
     limit,
   }: PaginationQueryDto): Promise<PaginationResponse<Post>> {
-    const [data, total] = await this.postRepository.findManyWithTotal({
-      skip: (page - 1) * limit,
-      take: limit,
-    });
+    const [data, total] = await this.postRepository.findManyWithTotal(
+      getPaginationParams(page, limit),
+    );
 
     return buildPaginationResponse<Post>(data, {
       page,
@@ -60,7 +52,7 @@ export class PostService {
     });
   }
 
-  async findOne(postId: UUIDParamDto['id']): Promise<Post> {
+  async findOne(postId: string): Promise<Post> {
     const post = await this.postRepository.findOne(postId);
 
     if (!post) {
@@ -70,20 +62,16 @@ export class PostService {
     return post;
   }
 
-  update(postId: UUIDParamDto['id'], updatePostDto: UpdatePostDto) {
+  update(postId: string, updatePostDto: UpdatePostDto) {
     return this.prisma.runInTransaction(async () => {
       return this.postRepository.update(postId, updatePostDto);
     });
   }
 
-  delete(postId: UUIDParamDto['id']) {
+  delete(postId: string) {
     return this.prisma.runInTransaction(async () => {
       const post = await this.findOne(postId);
-
-      if (post.images && post.images.length > 0) {
-        await this.imageService.deleteImages(post.images);
-      }
-
+      await this.imageService.deleteImages(post.images);
       return this.postRepository.delete(postId);
     });
   }

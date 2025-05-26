@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ImageService } from '../image/image.service';
-import { FileSubdirectory } from '../file/enum/file.enum';
+import { FileSubdirectory } from '@app/shared';
 import { ProfileNotFoundException } from './exeptions/profileNotFound.exeption';
 import { ProfileRepository } from './profile.repository';
 

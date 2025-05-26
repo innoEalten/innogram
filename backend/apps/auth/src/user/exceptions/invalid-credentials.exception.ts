@@ -1,8 +1,8 @@
 import { UnauthorizedException } from '@nestjs/common';
-import { AUTH_ERROR_MESSAGES } from '@app/shared/constants/auth.constants';
+import { AuthErrorMessages } from '@app/shared';
 
 export class InvalidCredentialsException extends UnauthorizedException {
   constructor() {
-    super(AUTH_ERROR_MESSAGES.INVALID_CREDENTIALS);
+    super(AuthErrorMessages.INVALID_CREDENTIALS);
   }
 }

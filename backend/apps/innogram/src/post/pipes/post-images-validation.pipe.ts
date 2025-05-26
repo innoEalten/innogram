@@ -3,14 +3,12 @@ import {
   MaxFileSizeValidator,
   FileTypeValidator,
 } from '@nestjs/common';
-
-const MAX_FILE_SIZE = 1024 * 1024 * 5;
-const FILE_TYPE = 'image/*';
+import { FileConfig } from '@app/shared';
 
 export const postImagesFileValidationPipe = new ParseFilePipe({
   validators: [
-    new MaxFileSizeValidator({ maxSize: MAX_FILE_SIZE }),
-    new FileTypeValidator({ fileType: FILE_TYPE }),
+    new MaxFileSizeValidator({ maxSize: FileConfig.MAX_FILE_SIZE }),
+    new FileTypeValidator({ fileType: FileConfig.FILE_TYPE }),
   ],
   fileIsRequired: true,
 });

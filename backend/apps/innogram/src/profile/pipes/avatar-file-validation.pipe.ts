@@ -1,14 +1,14 @@
-import { ParseFilePipe } from '@nestjs/common';
-import { MaxFileSizeValidator } from '@nestjs/common';
-import { FileTypeValidator } from '@nestjs/common';
-
-const MAX_FILE_SIZE = 1024 * 1024 * 2;
-const FILE_TYPE = 'image/*';
+import {
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
+} from '@nestjs/common';
+import { FileConfig } from '@app/shared';
 
 export const avatarFileValidationPipe = new ParseFilePipe({
   validators: [
-    new MaxFileSizeValidator({ maxSize: MAX_FILE_SIZE }),
-    new FileTypeValidator({ fileType: FILE_TYPE }),
+    new MaxFileSizeValidator({ maxSize: FileConfig.MAX_AVATAR_SIZE }),
+    new FileTypeValidator({ fileType: FileConfig.FILE_TYPE }),
   ],
   fileIsRequired: true,
 });

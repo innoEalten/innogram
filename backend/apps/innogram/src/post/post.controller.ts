@@ -10,14 +10,10 @@ import {
   UploadedFiles,
   UseInterceptors,
   Query,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { PostService } from './post.service';
-import {
-  CreatePostDto,
-  UUIDParamDto,
-  UpdatePostDto,
-  PaginationQueryDto,
-} from './dto';
+import { CreatePostDto, UpdatePostDto, PaginationQueryDto } from './dto';
 import { JwtGuard } from '../jwt/guards/jwt.guard';
 import {
   ApiBearerAuth,
@@ -27,13 +23,11 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { User } from '../auth/decorators/user.decorator';
-import type { User as UserType } from '@app/shared';
+import { type User as UserType, FileConfig } from '@app/shared';
 import { postImagesFileValidationPipe } from './pipes/post-images-validation.pipe';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { uploadPostForm } from './decorators/upload-post-form.decorator';
+import { ApiBodyUploadPost } from './decorators';
 import { PostOwnerGuard } from './guards';
-
-const MAX_FILE_NUMBER = 5;
 
 @Controller('posts')
 @UseGuards(JwtGuard)
@@ -46,8 +40,8 @@ export class PostController {
   @ApiOperation({ summary: 'Create a new post' })
   @ApiConsumes('multipart/form-data')
   @ApiResponse({ status: 201, description: 'Post created successfully' })
-  @uploadPostForm
-  @UseInterceptors(FilesInterceptor('files', MAX_FILE_NUMBER))
+  @ApiBodyUploadPost
+  @UseInterceptors(FilesInterceptor('files', FileConfig.MAX_FILE_NUMBER))
   create(
     @Body() createPostDto: CreatePostDto,
     @User() { _id }: UserType,
@@ -73,8 +67,8 @@ export class PostController {
     status: 200,
     description: 'Post returned successfully',
   })
-  findOne(@Param() { id: postId }: UUIDParamDto) {
-    return this.postService.findOne(postId);
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return this.postService.findOne(id);
   }
 
   @Patch(':id')
@@ -82,10 +76,10 @@ export class PostController {
   @ApiResponse({ status: 200, description: 'Post updated successfully' })
   @UseGuards(PostOwnerGuard)
   update(
-    @Param() { id: postId }: UUIDParamDto,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updatePostDto: UpdatePostDto,
   ) {
-    return this.postService.update(postId, updatePostDto);
+    return this.postService.update(id, updatePostDto);
   }
 
   @Delete(':id')
@@ -95,7 +89,7 @@ export class PostController {
     description: 'Post deleted successfully',
   })
   @UseGuards(PostOwnerGuard)
-  delete(@Param() { id: postId }: UUIDParamDto) {
-    return this.postService.delete(postId);
+  delete(@Param('id', ParseUUIDPipe) id: string) {
+    return this.postService.delete(id);
   }
 }

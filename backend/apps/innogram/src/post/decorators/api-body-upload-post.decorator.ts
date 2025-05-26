@@ -1,6 +1,6 @@
 import { ApiBody } from '@nestjs/swagger';
 
-export const uploadPostForm: MethodDecorator = (
+export const ApiBodyUploadPost: MethodDecorator = (
   target,
   propertyKey,
   descriptor,

@@ -1,5 +1,5 @@
-import { AUTH_ERROR_MESSAGES } from '@app/shared';
-import { ResponseErrorData } from '@app/shared/types/response-error-data';
+import { AUTH_ERROR_MESSAGES, ResponseErrorData } from '@app/shared';
+
 import {
   ExceptionFilter,
   Catch,

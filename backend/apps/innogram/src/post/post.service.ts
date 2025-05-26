@@ -8,9 +8,10 @@ import {
 import { PostRepository } from './post.repository';
 import { ImageService } from '../image/image.service';
 import { FileSubdirectory } from '../file/enum/file.enum';
-import { PostNotFoundException, ForbiddenPostException } from './exeptions';
-import type { User, PaginationResponse, PostWithImages } from '@app/shared';
+import { PostNotFoundException } from './exeptions';
+import type { User, PaginationResponse, Post } from '@app/shared';
 import { PrismaService } from '@app/prisma';
+import { buildPaginationResponse } from './utils';
 
 @Injectable()
 export class PostService {
@@ -19,15 +20,6 @@ export class PostService {
     private readonly imageService: ImageService,
     private readonly prisma: PrismaService,
   ) {}
-
-  private static validatePostOwnership(
-    postId: UUIDParamDto['id'],
-    userId: User['_id'],
-  ) {
-    if (postId !== userId) {
-      throw new ForbiddenPostException();
-    }
-  }
 
   create(
     createPostDto: CreatePostDto,
@@ -55,32 +47,20 @@ export class PostService {
   async findMany({
     page,
     limit,
-  }: PaginationQueryDto): Promise<PaginationResponse<PostWithImages>> {
+  }: PaginationQueryDto): Promise<PaginationResponse<Post>> {
     const [data, total] = await this.postRepository.findManyWithTotal({
       skip: (page - 1) * limit,
       take: limit,
     });
 
-    const totalPages = Math.ceil(total / limit);
-    const isValidPage = page === 1 || (page <= totalPages && totalPages > 0);
-
-    if (!isValidPage) {
-      throw new PostNotFoundException();
-    }
-
-    return {
-      data,
+    return buildPaginationResponse<Post>(data, {
       page,
       limit,
       total,
-      hasNextPage: page < totalPages,
-      hasPreviousPage: page > 1,
-      nextPage: page < totalPages ? page + 1 : null,
-      previousPage: page > 1 ? page - 1 : null,
-    };
+    });
   }
 
-  async findOne(postId: UUIDParamDto['id']): Promise<PostWithImages> {
+  async findOne(postId: UUIDParamDto['id']): Promise<Post> {
     const post = await this.postRepository.findOne(postId);
 
     if (!post) {
@@ -90,23 +70,15 @@ export class PostService {
     return post;
   }
 
-  update(
-    postId: UUIDParamDto['id'],
-    updatePostDto: UpdatePostDto,
-    userId: User['_id'],
-  ) {
+  update(postId: UUIDParamDto['id'], updatePostDto: UpdatePostDto) {
     return this.prisma.runInTransaction(async () => {
-      const post = await this.findOne(postId);
-      PostService.validatePostOwnership(post.author.userId, userId);
-
       return this.postRepository.update(postId, updatePostDto);
     });
   }
 
-  delete(postId: UUIDParamDto['id'], userId: User['_id']) {
+  delete(postId: UUIDParamDto['id']) {
     return this.prisma.runInTransaction(async () => {
       const post = await this.findOne(postId);
-      PostService.validatePostOwnership(post.author.userId, userId);
 
       if (post.images && post.images.length > 0) {
         await this.imageService.deleteImages(post.images);

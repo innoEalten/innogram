@@ -35,12 +35,8 @@ export class ProfileService {
       FileSubdirectory.AVATARS,
     );
 
-    if (!imageEntity) {
-      throw new Error('Failed to upload image');
-    }
-
     const updatedProfile = await this.profileRepository.update(id, {
-      imageId: imageEntity.id,
+      imageId: imageEntity!.id,
     });
 
     if (profile.image) {

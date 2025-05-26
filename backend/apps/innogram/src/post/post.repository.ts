@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@app/prisma';
 import { CreatePostWithAuthorDto, UpdatePostDto, UUIDParamDto } from './dto';
+import { postSelect } from '@app/shared';
 
 @Injectable()
 export class PostRepository {
@@ -16,29 +17,7 @@ export class PostRepository {
     return this.prisma.$transaction([
       this.prisma.post.findMany({
         ...pagination,
-        select: {
-          id: true,
-          title: true,
-          body: true,
-          createdAt: true,
-          author: {
-            select: {
-              userId: true,
-              name: true,
-            },
-          },
-          images: {
-            select: {
-              id: true,
-              file: {
-                select: {
-                  id: true,
-                  url: true,
-                },
-              },
-            },
-          },
-        },
+        select: postSelect,
         orderBy: {
           createdAt: 'desc',
         },
@@ -50,29 +29,7 @@ export class PostRepository {
   findOne(id: UUIDParamDto['id']) {
     return this.prisma.getClient().post.findUnique({
       where: { id },
-      select: {
-        id: true,
-        title: true,
-        body: true,
-        createdAt: true,
-        author: {
-          select: {
-            userId: true,
-            name: true,
-          },
-        },
-        images: {
-          select: {
-            id: true,
-            file: {
-              select: {
-                id: true,
-                url: true,
-              },
-            },
-          },
-        },
-      },
+      select: postSelect,
     });
   }
 

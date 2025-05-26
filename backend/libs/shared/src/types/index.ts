@@ -1,2 +1,2 @@
-export { type PostWithImages } from './post-with-images';
-export { type Image } from './image';
+export { type Image } from './image.type';
+export { type ResponseErrorData } from './response-error-data.type';

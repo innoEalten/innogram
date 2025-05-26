@@ -31,6 +31,7 @@ import type { User as UserType } from '@app/shared';
 import { postImagesFileValidationPipe } from './pipes/post-images-validation.pipe';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { uploadPostForm } from './decorators/upload-post-form.decorator';
+import { PostOwnerGuard } from './guards';
 
 const MAX_FILE_NUMBER = 5;
 
@@ -79,12 +80,12 @@ export class PostController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update a post (optionally replace/add images)' })
   @ApiResponse({ status: 200, description: 'Post updated successfully' })
+  @UseGuards(PostOwnerGuard)
   update(
     @Param() { id: postId }: UUIDParamDto,
     @Body() updatePostDto: UpdatePostDto,
-    @User() { _id }: UserType,
   ) {
-    return this.postService.update(postId, updatePostDto, _id);
+    return this.postService.update(postId, updatePostDto);
   }
 
   @Delete(':id')
@@ -93,7 +94,8 @@ export class PostController {
     status: 200,
     description: 'Post deleted successfully',
   })
-  delete(@Param() { id: postId }: UUIDParamDto, @User() { _id }: UserType) {
-    return this.postService.delete(postId, _id);
+  @UseGuards(PostOwnerGuard)
+  delete(@Param() { id: postId }: UUIDParamDto) {
+    return this.postService.delete(postId);
   }
 }

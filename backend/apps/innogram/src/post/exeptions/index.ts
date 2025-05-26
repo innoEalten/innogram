@@ -1,2 +1,2 @@
-export { PostNotFoundException } from './post-not-found.exeption';
-export { ForbiddenPostException } from './forbidden-post-exception';
+export * from './post-not-found.exeption';
+export * from './forbidden-post-exception';

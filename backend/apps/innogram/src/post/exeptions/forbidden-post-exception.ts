@@ -1,7 +1,8 @@
 import { ForbiddenException } from '@nestjs/common';
+import { POST_ERROR_MESSAGES } from '@app/shared';
 
 export class ForbiddenPostException extends ForbiddenException {
   constructor() {
-    super('You are not allowed to perform operations on this post');
+    super(POST_ERROR_MESSAGES.FORBIDDEN_POST);
   }
 }

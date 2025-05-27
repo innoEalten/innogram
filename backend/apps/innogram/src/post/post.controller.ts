@@ -13,7 +13,7 @@ import {
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { PostService } from './post.service';
-import { CreatePostDto, UpdatePostDto, PaginationQueryDto } from './dto';
+import { CreatePostDto, UpdatePostDto } from './dto';
 import { JwtGuard } from '../jwt/guards/jwt.guard';
 import {
   ApiBearerAuth,
@@ -23,14 +23,20 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { User } from '../auth/decorators/user.decorator';
-import { type User as UserType, FileConfig } from '@app/shared';
+import {
+  type User as UserType,
+  FileConfig,
+  PaginationQueryDto,
+} from '@app/shared';
 import { postImagesFileValidationPipe } from './pipes/post-images-validation.pipe';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBodyUploadPost } from './decorators';
 import { PostOwnerGuard } from './guards';
+import { CompensationInterceptor } from '../compensation';
 
 @Controller('posts')
 @UseGuards(JwtGuard)
+@UseInterceptors(CompensationInterceptor)
 @ApiBearerAuth()
 @ApiTags('Posts')
 export class PostController {

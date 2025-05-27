@@ -1,19 +1,24 @@
 import { Injectable } from '@nestjs/common';
-import { CreatePostDto, UpdatePostDto, PaginationQueryDto } from './dto';
+import { CreatePostDto, UpdatePostDto } from './dto';
+import {
+  type PaginationResponse,
+  type Post,
+  PaginationQueryDto,
+  getPaginationParams,
+  buildPaginationResponse,
+  FileSubdirectory,
+} from '@app/shared';
 import { PostRepository } from './post.repository';
 import { ImageService } from '../image/image.service';
 import { PostNotFoundException } from './exeptions';
-import type { PaginationResponse, Post } from '@app/shared';
-import { FileSubdirectory } from '@app/shared';
 import { PrismaService } from '@app/prisma';
-import { buildPaginationResponse, getPaginationParams } from './utils';
 
 @Injectable()
 export class PostService {
   constructor(
     private readonly postRepository: PostRepository,
     private readonly imageService: ImageService,
-    private readonly prisma: PrismaService,
+    private readonly prismaService: PrismaService,
   ) {}
 
   create(
@@ -21,7 +26,7 @@ export class PostService {
     userId: string,
     files: Express.Multer.File[],
   ) {
-    return this.prisma.runInTransaction(async () => {
+    return this.prismaService.runInTransaction(async () => {
       const newPost = await this.postRepository.create({
         ...createPostDto,
         authorId: userId,
@@ -63,15 +68,19 @@ export class PostService {
   }
 
   update(postId: string, updatePostDto: UpdatePostDto) {
-    return this.prisma.runInTransaction(async () => {
+    return this.prismaService.runInTransaction(async () => {
       return this.postRepository.update(postId, updatePostDto);
     });
   }
 
   delete(postId: string) {
-    return this.prisma.runInTransaction(async () => {
+    return this.prismaService.runInTransaction(async () => {
       const post = await this.findOne(postId);
-      await this.imageService.deleteImages(post.images);
+
+      if (post.images.length > 0) {
+        await this.imageService.deleteImages(post.images);
+      }
+
       return this.postRepository.delete(postId);
     });
   }

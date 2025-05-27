@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { FileSubdirectory } from '@app/shared';
 import { MinioService } from '../minio/minio.service';
 import { FileRepository } from './file.repository';
+import { type Image } from '@app/shared';
 
 @Injectable()
 export class FileService {
@@ -10,19 +11,39 @@ export class FileService {
     private readonly fileRepository: FileRepository,
   ) {}
 
+  async uploadFile(file: Express.Multer.File, subdirectory: FileSubdirectory) {
+    const uploadedFilePath = await this.minioService.uploadObject(
+      file,
+      subdirectory,
+    );
+
+    return this.fileRepository.create({
+      url: uploadedFilePath,
+    });
+  }
+
   async uploadFiles(
     files: Express.Multer.File[],
     subdirectory: FileSubdirectory,
   ) {
-    const filePaths = await this.minioService.uploadObjects(
+    const uploadedFilePaths = await this.minioService.uploadObjects(
       files,
       subdirectory,
     );
-    const fileEntities = filePaths.map((filePath) => ({ url: filePath }));
+
+    const fileEntities = uploadedFilePaths.map((filePath) => ({
+      url: filePath,
+    }));
+
     return this.fileRepository.createMany(fileEntities);
   }
 
-  async deleteFiles(files: { id: string; url: string }[]) {
+  async deleteFile(file: Image['file']) {
+    await this.minioService.removeObject(file.url);
+    return this.fileRepository.delete(file.id);
+  }
+
+  async deleteFiles(files: Image['file'][]) {
     await this.minioService.removeObjects(files.map((file) => file.url));
     return this.fileRepository.deleteMany(files.map((file) => file.id));
   }

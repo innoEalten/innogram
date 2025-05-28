@@ -6,9 +6,3 @@ export class PostNotFoundException extends NotFoundException {
     super(PostErrorMessages.POST_NOT_FOUND);
   }
 }
-
-export class PostsNotFoundException extends NotFoundException {
-  constructor() {
-    super(PostErrorMessages.POSTS_NOT_FOUND);
-  }
-}

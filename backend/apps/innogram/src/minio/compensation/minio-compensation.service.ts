@@ -1,9 +1,10 @@
 import { Injectable, Scope, Logger } from '@nestjs/common';
+import { MinioErrorMessages } from '@app/shared';
 
 @Injectable({ scope: Scope.REQUEST })
-export class CompensationService {
-  private readonly logger = new Logger(CompensationService.name);
-  private compensations: (() => Promise<void>)[] = [];
+export class MinioCompensationService {
+  private readonly logger = new Logger(MinioCompensationService.name);
+  compensations: (() => Promise<void>)[] = [];
 
   hasCompensations(): boolean {
     return this.compensations.length > 0;
@@ -18,7 +19,7 @@ export class CompensationService {
       try {
         await fn();
       } catch (error) {
-        this.logger.error('Compensation failed');
+        this.logger.error(MinioErrorMessages.MINIO_COMPENSATION_ERROR, error);
       }
     }
   }

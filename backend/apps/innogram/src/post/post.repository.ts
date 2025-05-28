@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@app/prisma';
 import { type PostWithAuthor, UpdatePostDto } from './dto';
-import { postSelect } from '@app/shared';
+import { postSelect, PaginationParams } from '@app/shared';
 
 @Injectable()
 export class PostRepository {
@@ -13,7 +13,7 @@ export class PostRepository {
     });
   }
 
-  findManyWithTotal(pagination: { skip: number; take: number }) {
+  findManyWithTotal(pagination: PaginationParams) {
     return this.prisma.$transaction([
       this.prisma.post.findMany({
         ...pagination,

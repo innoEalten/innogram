@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { PostService } from '../post.service';
-import { ForbiddenPostException } from '../exeptions';
+import { ForbiddenPostException } from '../exceptions';
 import { RequestWithUser } from '@app/shared';
 
 @Injectable()

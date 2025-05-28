@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ImageService } from '../image/image.service';
-import { FileSubdirectory } from '../file/enum/file.enum';
+import { FileSubdirectory } from '@app/shared';
 import { ProfileNotFoundException } from './exeptions/profileNotFound.exeption';
 import { ProfileRepository } from './profile.repository';
 
@@ -30,17 +30,17 @@ export class ProfileService {
   async uploadAvatar(id: string, file: Express.Multer.File) {
     const profile = await this.getProfile(id);
 
-    const [imageEntity] = await this.imageService.uploadImages(
-      [file],
+    const imageEntity = await this.imageService.uploadImage(
+      file,
       FileSubdirectory.AVATARS,
     );
 
     const updatedProfile = await this.profileRepository.update(id, {
-      imageId: imageEntity!.id,
+      imageId: imageEntity.id,
     });
 
     if (profile.image) {
-      await this.imageService.deleteImages([profile.image]);
+      await this.imageService.deleteImage(profile.image);
     }
 
     return updatedProfile;

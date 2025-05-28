@@ -19,6 +19,6 @@ export class CreatePostDto {
   body: string;
 }
 
-export type CreatePostWithAuthorDto = CreatePostDto & {
+export interface PostWithAuthor extends CreatePostDto {
   authorId: string;
-};
+}

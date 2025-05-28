@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@app/prisma';
-import { CreatePostWithAuthorDto, UpdatePostDto, UUIDParamDto } from './dto';
+import { type PostWithAuthor, UpdatePostDto } from './dto';
 import { postSelect } from '@app/shared';
 
 @Injectable()
 export class PostRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(data: CreatePostWithAuthorDto) {
+  create(data: PostWithAuthor) {
     return this.prisma.getClient().post.create({
       data,
     });
@@ -26,23 +26,23 @@ export class PostRepository {
     ]);
   }
 
-  findOne(id: UUIDParamDto['id']) {
+  findOne(postId: string) {
     return this.prisma.getClient().post.findUnique({
-      where: { id },
+      where: { id: postId },
       select: postSelect,
     });
   }
 
-  update(id: UUIDParamDto['id'], data: UpdatePostDto) {
+  update(postId: string, data: UpdatePostDto) {
     return this.prisma.getClient().post.update({
-      where: { id },
+      where: { id: postId },
       data,
     });
   }
 
-  delete(id: UUIDParamDto['id']) {
+  delete(postId: string) {
     return this.prisma.getClient().post.delete({
-      where: { id },
+      where: { id: postId },
     });
   }
 }

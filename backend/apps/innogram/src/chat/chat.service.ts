@@ -1,5 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { ChatRepository } from './chat.repository';
+import {
+  buildPaginationResponse,
+  getPaginationParams,
+  PaginationQueryDto,
+} from '@app/shared';
+import { Chat, Message } from '@prisma/client';
 @Injectable()
 export class ChatService {
   constructor(private readonly chatRepository: ChatRepository) {}
@@ -30,11 +36,29 @@ export class ChatService {
     return this.chatRepository.createMessage(chatId, senderId, content);
   }
 
-  async getChatMessages(chatId: string) {
-    return this.chatRepository.getChatMessages(chatId);
+  async getChatMessages(chatId: string, { page, limit }: PaginationQueryDto) {
+    const [data, total] = await this.chatRepository.getChatMessagesWithTotal(
+      chatId,
+      getPaginationParams(page, limit),
+    );
+
+    return buildPaginationResponse<Message>(data, {
+      page,
+      limit,
+      total,
+    });
   }
 
-  async getUserChats(userId: string) {
-    return this.chatRepository.getUserChats(userId);
+  async getUserChats(userId: string, { page, limit }: PaginationQueryDto) {
+    const [data, total] = await this.chatRepository.getUserChatsWithTotal(
+      userId,
+      getPaginationParams(page, limit),
+    );
+
+    return buildPaginationResponse<Chat>(data, {
+      page,
+      limit,
+      total,
+    });
   }
 }

@@ -34,22 +34,38 @@ export class ChatRepository {
     });
   }
 
-  async getChatMessages(chatId: string) {
-    return this.prisma.message.findMany({
-      where: { chatId },
-      orderBy: { createdAt: 'asc' },
-    });
+  async getChatMessagesWithTotal(
+    chatId: string,
+    pagination: { skip: number; take: number },
+  ) {
+    return this.prisma.$transaction([
+      this.prisma.message.findMany({
+        ...pagination,
+        where: { chatId },
+        orderBy: { createdAt: 'asc' },
+      }),
+      this.prisma.message.count({ where: { chatId } }),
+    ]);
   }
 
-  async getUserChats(userId: string) {
-    return this.prisma.chat.findMany({
-      where: { OR: [{ initiatorId: userId }, { recipientId: userId }] },
-      include: {
-        messages: {
-          orderBy: { createdAt: 'asc' },
-          take: 1,
+  async getUserChatsWithTotal(
+    userId: string,
+    pagination: { skip: number; take: number },
+  ) {
+    return this.prisma.$transaction([
+      this.prisma.chat.findMany({
+        ...pagination,
+        where: { OR: [{ initiatorId: userId }, { recipientId: userId }] },
+        include: {
+          messages: {
+            orderBy: { createdAt: 'asc' },
+            take: 1,
+          },
         },
-      },
-    });
+      }),
+      this.prisma.chat.count({
+        where: { OR: [{ initiatorId: userId }, { recipientId: userId }] },
+      }),
+    ]);
   }
 }

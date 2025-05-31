@@ -1,20 +1,23 @@
 import { PrismaService } from '@app/prisma';
 import { Injectable } from '@nestjs/common';
-
-type ImageData = {
-  fileId: string;
-  postId?: string;
-};
+import { CreateImageInput } from './types/create-image-input';
 
 @Injectable()
 export class ImageRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(data: ImageData) {
+  findOne(id: string) {
+    return this.prisma.getClient().image.findUnique({
+      where: { id },
+      include: { file: true },
+    });
+  }
+
+  create(data: CreateImageInput) {
     return this.prisma.getClient().image.create({ data });
   }
 
-  createMany(data: ImageData[]) {
+  createMany(data: CreateImageInput[]) {
     return this.prisma.getClient().image.createManyAndReturn({ data });
   }
 

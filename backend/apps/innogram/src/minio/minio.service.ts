@@ -5,8 +5,7 @@ import { FileSubdirectory } from '@app/shared';
 import { ConfigService } from '@nestjs/config';
 import { createHash } from 'crypto';
 import { extname } from 'path';
-import { CompensationService } from '../compensation';
-// import { Readable } from 'stream';
+import { MinioCompensationService } from './compensation';
 
 @Injectable()
 export class MinioService {
@@ -15,7 +14,7 @@ export class MinioService {
   constructor(
     @InjectMinio() private readonly minioClient: Client,
     private readonly configService: ConfigService,
-    private readonly compensationService: CompensationService,
+    private readonly compensationService: MinioCompensationService,
   ) {
     this._bucketName =
       this.configService.getOrThrow<string>('MINIO_BUCKET_NAME');
@@ -28,21 +27,6 @@ export class MinioService {
       .digest('hex');
     return `${hash}${ext}`;
   }
-
-  // private async getFileBuffer(filePath: string): Promise<Buffer> {
-  //   const dataStream: Readable = await this.minioClient.getObject(
-  //     this._bucketName,
-  //     filePath,
-  //   );
-
-  //   return new Promise<Buffer>((resolve, reject) => {
-  //     const chunks: Buffer[] = [];
-
-  //     dataStream.on('data', (chunk: Buffer) => chunks.push(chunk));
-  //     dataStream.on('end', () => resolve(Buffer.concat(chunks)));
-  //     dataStream.on('error', (error) => reject(error));
-  //   });
-  // }
 
   private async uploadSingleFile(
     file: Express.Multer.File,
@@ -63,7 +47,7 @@ export class MinioService {
     );
 
     this.compensationService.register(async () => {
-      this.minioClient.removeObject(this._bucketName, filePath);
+      await this.minioClient.removeObject(this._bucketName, filePath);
     });
 
     return filePath;
@@ -84,7 +68,7 @@ export class MinioService {
         filePath,
         `/${this._bucketName}/${trashPath}`,
       );
-      this.minioClient.removeObject(this._bucketName, trashPath);
+      await this.minioClient.removeObject(this._bucketName, trashPath);
     });
 
     await this.minioClient.removeObject(this._bucketName, filePath);
@@ -119,25 +103,4 @@ export class MinioService {
       }),
     );
   }
-
-  // const [fileBuffer, stats] = await Promise.all([
-  //   this.getFileBuffer(filePath),
-  //   this.minioClient.statObject(this._bucketName, filePath),
-  // ]);
-
-  // this.compensationService.register(async () => {
-  //   this.minioClient.putObject(
-  //     this._bucketName,
-  //     filePath,
-  //     fileBuffer,
-  //     stats.size,
-
-  //     {
-  //       'Content-Type':
-  //         stats.metaData['content-type'] || 'application/octet-stream',
-  //     },
-  //   );
-  // });
-
-  // await this.minioClient.removeObject(this._bucketName, filePath);
 }

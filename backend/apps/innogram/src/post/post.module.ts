@@ -5,10 +5,10 @@ import { PrismaModule } from '@app/prisma';
 import { ImageModule } from '../image/image.module';
 import { PostRepository } from './post.repository';
 import { JwtModule } from '../jwt/jwt.module';
-import { CompensationModule } from '../compensation';
+import { MinioModule } from '../minio';
 
 @Module({
-  imports: [PrismaModule, ImageModule, JwtModule, CompensationModule],
+  imports: [PrismaModule, ImageModule, JwtModule, MinioModule],
   controllers: [PostController],
   providers: [PostService, PostRepository],
 })

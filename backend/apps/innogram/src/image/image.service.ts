@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { FileService } from '../file/file.service';
 import { type Image, FileSubdirectory } from '@app/shared';
 import { ImageRepository } from './image.repository';
+import { ImageNotFoundException } from './exceptions';
 
 @Injectable()
 export class ImageService {
@@ -9,6 +10,16 @@ export class ImageService {
     private readonly fileService: FileService,
     private readonly imageRepository: ImageRepository,
   ) {}
+
+  async findOne(imageId: string) {
+    const image = await this.imageRepository.findOne(imageId);
+
+    if (!image) {
+      throw new ImageNotFoundException();
+    }
+
+    return image;
+  }
 
   async uploadImage(
     file: Express.Multer.File,

@@ -5,11 +5,11 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Observable, catchError } from 'rxjs';
-import { CompensationService } from './compensation.service';
+import { MinioCompensationService } from './minio-compensation.service';
 
 @Injectable()
-export class CompensationInterceptor implements NestInterceptor {
-  constructor(private readonly compensationService: CompensationService) {}
+export class MinioCompensationInterceptor implements NestInterceptor {
+  constructor(private readonly compensationService: MinioCompensationService) {}
 
   intercept(_context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(

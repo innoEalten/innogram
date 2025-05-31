@@ -10,7 +10,7 @@ import {
 } from '@app/shared';
 import { PostRepository } from './post.repository';
 import { ImageService } from '../image/image.service';
-import { PostNotFoundException } from './exeptions';
+import { PostNotFoundException } from './exceptions';
 import { PrismaService } from '@app/prisma';
 
 @Injectable()
@@ -42,17 +42,15 @@ export class PostService {
     });
   }
 
-  async findMany({
-    page,
-    limit,
-  }: PaginationQueryDto): Promise<PaginationResponse<Post>> {
+  async findMany(
+    paginationQueryDto: PaginationQueryDto,
+  ): Promise<PaginationResponse<Post>> {
     const [data, total] = await this.postRepository.findManyWithTotal(
-      getPaginationParams(page, limit),
+      getPaginationParams(paginationQueryDto),
     );
 
     return buildPaginationResponse<Post>(data, {
-      page,
-      limit,
+      ...paginationQueryDto,
       total,
     });
   }
@@ -67,9 +65,26 @@ export class PostService {
     return post;
   }
 
-  update(postId: string, updatePostDto: UpdatePostDto) {
+  update(postId: string, { removeImageIds, body, title }: UpdatePostDto) {
     return this.prismaService.runInTransaction(async () => {
-      return this.postRepository.update(postId, updatePostDto);
+      if (removeImageIds?.length) {
+        for (const imageId of removeImageIds) {
+          const image = await this.imageService.findOne(imageId);
+
+          if (image.postId === postId) {
+            await this.imageService.deleteImage(image);
+          }
+        }
+      }
+
+      if (body || title) {
+        await this.postRepository.update(postId, {
+          body,
+          title,
+        });
+      }
+
+      return this.postRepository.findOne(postId);
     });
   }
 

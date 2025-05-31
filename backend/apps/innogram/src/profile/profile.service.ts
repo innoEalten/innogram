@@ -3,7 +3,7 @@ import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ImageService } from '../image/image.service';
 import { FileSubdirectory } from '@app/shared';
-import { ProfileNotFoundException } from './exeptions/profileNotFound.exeption';
+import { ProfileNotFoundException } from './exceptions/profile-not-found.exception';
 import { ProfileRepository } from './profile.repository';
 
 @Injectable()

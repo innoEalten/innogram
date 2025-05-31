@@ -14,7 +14,7 @@ import {
 class AtLeastOneFileConstraint implements ValidatorConstraintInterface {
   validate(_: unknown, args: ValidationArguments) {
     const obj = args.object as UpdatePostDto;
-    return !!(obj.title || obj.body || obj.removeImageIds);
+    return !!(obj.title || obj.body || obj.removeImageIds?.length);
   }
 
   defaultMessage(_: ValidationArguments) {

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { FileSubdirectory } from '@app/shared';
 import { MinioService } from '../minio/minio.service';
 import { FileRepository } from './file.repository';
-import { type Image } from '@app/shared';
+import { type File } from '@app/shared';
 
 @Injectable()
 export class FileService {
@@ -38,12 +38,12 @@ export class FileService {
     return this.fileRepository.createMany(fileEntities);
   }
 
-  async deleteFile(file: Image['file']) {
+  async deleteFile(file: File) {
     await this.minioService.removeObject(file.url);
     return this.fileRepository.delete(file.id);
   }
 
-  async deleteFiles(files: Image['file'][]) {
+  async deleteFiles(files: File[]) {
     await this.minioService.removeObjects(files.map((file) => file.url));
     return this.fileRepository.deleteMany(files.map((file) => file.id));
   }

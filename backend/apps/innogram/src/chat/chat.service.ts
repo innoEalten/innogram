@@ -6,18 +6,18 @@ import {
   PaginationQueryDto,
 } from '@app/shared';
 import { Chat, Message } from '@prisma/client';
+import type { ChatUserParams } from './types/chat-user-params.type';
+import { ChatErrorMessages } from '@app/shared/constants/chat.constants';
+import { WsException } from '@nestjs/websockets';
 @Injectable()
 export class ChatService {
   constructor(private readonly chatRepository: ChatRepository) {}
 
-  async getOrCreateChat(initiatorId: string, recipientId: string) {
-    const chat = await this.chatRepository.getChatWithUser(
-      initiatorId,
-      recipientId,
-    );
+  async getOrCreateChat(chatUserParams: ChatUserParams) {
+    const chat = await this.chatRepository.getChatWithUser(chatUserParams);
 
     if (!chat) {
-      return this.chatRepository.createChat(initiatorId, recipientId);
+      return this.chatRepository.createChat(chatUserParams);
     }
 
     return chat;
@@ -27,19 +27,19 @@ export class ChatService {
     const chat = await this.chatRepository.getChatById(chatId);
 
     if (!chat || (chat.initiatorId !== userId && chat.recipientId !== userId))
-      return;
+      throw new WsException(ChatErrorMessages.INVALID_CHAT);
 
     return chat;
   }
 
-  async createMessage(chatId: string, senderId: string, content: string) {
+  createMessage(chatId: string, senderId: string, content: string) {
     return this.chatRepository.createMessage(chatId, senderId, content);
   }
 
   async getChatMessages(chatId: string, { page, limit }: PaginationQueryDto) {
     const [data, total] = await this.chatRepository.getChatMessagesWithTotal(
       chatId,
-      getPaginationParams(page, limit),
+      getPaginationParams({ page, limit }),
     );
 
     return buildPaginationResponse<Message>(data, {
@@ -52,7 +52,7 @@ export class ChatService {
   async getUserChats(userId: string, { page, limit }: PaginationQueryDto) {
     const [data, total] = await this.chatRepository.getUserChatsWithTotal(
       userId,
-      getPaginationParams(page, limit),
+      getPaginationParams({ page, limit }),
     );
 
     return buildPaginationResponse<Chat>(data, {

@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { SocketWithUser } from '@app/shared/interfaces/socket-user.interface';
 import { JwtStrategy } from '../strategies/jwt.strategy';
-import { WsInvalidTokenException } from '../exeptions/invalid-token.exeption';
+import { WsInvalidTokenException } from '../exceptions/invalid-token.ecxeption';
 
 @Injectable()
 export class WsAuthGuard implements CanActivate {

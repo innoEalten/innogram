@@ -1,3 +1,4 @@
-export const CHAT_ERROR_MESSAGES = {
+export const ChatErrorMessages = {
   INVALID_MESSAGE: 'Invalid message',
+  INVALID_CHAT: 'Invalid chat',
 };

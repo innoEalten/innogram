@@ -8,7 +8,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { WsAuthGuard } from '../jwt/guards/ws-jwt.guard';
-import { WsInvalidTokenException } from '../jwt/exeptions/invalid-token.exeption';
+import { WsInvalidTokenException } from '../jwt/exceptions/invalid-token.ecxeption';
 import { JwtStrategy } from '../jwt/strategies/jwt.strategy';
 import { ChatService } from './chat.service';
 import { WsUser } from '../auth/decorators/ws-user.decorator';
@@ -49,10 +49,7 @@ export class ChatGateway {
 
   @SubscribeMessage('join_chat')
   @UseGuards(ChatAccessGuard)
-  async handleJoinChat(
-    @ConnectedSocket() client: Socket,
-    @WsChat() chat: Chat,
-  ) {
+  handleJoinChat(@ConnectedSocket() client: Socket, @WsChat() chat: Chat) {
     return client.join(chat.id);
   }
 

@@ -62,6 +62,8 @@ model Chat {
   recipient Profile @relation("ChatRecipient", fields: [recipientId], references: [userId])
   
   messages Message[]
+
+  @@map("chats")
 }
 
 model Message {
@@ -76,4 +78,6 @@ model Message {
   
   chat Chat @relation(fields: [chatId], references: [id])
   sender Profile @relation(fields: [senderId], references: [userId])
+
+  @@map("messages")
 }

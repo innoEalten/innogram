@@ -21,12 +21,15 @@ export class ChatController {
   constructor(private readonly chatService: ChatService) {}
 
   @Post('init')
-  async initChat(@Body() body: InitChatDto, @User() user: UserType) {
-    return this.chatService.getOrCreateChat(user._id, body.recipientId);
+  initChat(@Body() body: InitChatDto, @User() user: UserType) {
+    return this.chatService.getOrCreateChat({
+      initiatorId: user._id,
+      recipientId: body.recipientId,
+    });
   }
 
   @Get()
-  async getUserChats(
+  getUserChats(
     @User() user: UserType,
     @Query() paginationQueryDto: PaginationQueryDto,
   ) {
@@ -34,7 +37,7 @@ export class ChatController {
   }
 
   @Get('messages/:chatId')
-  async getChatMessages(
+  getChatMessages(
     @Param('chatId') chatId: string,
     @Query() paginationQueryDto: PaginationQueryDto,
   ) {

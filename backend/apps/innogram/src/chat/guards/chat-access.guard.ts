@@ -1,5 +1,4 @@
-import { ExecutionContext } from '@nestjs/common';
-import { Injectable, CanActivate } from '@nestjs/common';
+import { ExecutionContext, Injectable, CanActivate } from '@nestjs/common';
 import { ChatService } from '../chat.service';
 import { SocketWithChatUser } from '../interfaces/socket-chat-user.interface';
 
@@ -15,8 +14,6 @@ export class ChatAccessGuard implements CanActivate {
 
     const user = client.user;
     const chat = await this.chatService.getValidatedUserChat(chatId, user._id);
-
-    if (!chat) return false;
 
     client.chat = chat;
 

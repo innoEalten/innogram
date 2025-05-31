@@ -1,43 +1,48 @@
 import { PrismaService } from '@app/prisma';
+import { PaginationParams } from '@app/shared';
 import { Injectable } from '@nestjs/common';
+import type { ChatUserParams } from './types/chat-user-params.type';
 
 @Injectable()
 export class ChatRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getChatWithUser(initiatorId: string, recipientId: string) {
+  getChatWithUser(chatUserParams: ChatUserParams) {
     return this.prisma.chat.findFirst({
       where: {
         OR: [
-          { initiatorId, recipientId },
-          { initiatorId: recipientId, recipientId: initiatorId },
+          {
+            initiatorId: chatUserParams.initiatorId,
+            recipientId: chatUserParams.recipientId,
+          },
+          {
+            initiatorId: chatUserParams.recipientId,
+            recipientId: chatUserParams.initiatorId,
+          },
         ],
       },
     });
   }
 
-  async getChatById(chatId: string) {
+  getChatById(chatId: string) {
     return this.prisma.chat.findUnique({
       where: { id: chatId },
     });
   }
 
-  async createChat(initiatorId: string, recipientId: string) {
+  createChat(chatUserParams: ChatUserParams) {
     return this.prisma.chat.create({
-      data: { initiatorId, recipientId },
+      data: chatUserParams,
     });
   }
 
-  async createMessage(chatId: string, senderId: string, content: string) {
+  createMessage(chatId: string, senderId: string, content: string) {
     return this.prisma.message.create({
       data: { chatId, senderId, content },
     });
   }
 
-  async getChatMessagesWithTotal(
-    chatId: string,
-    pagination: { skip: number; take: number },
-  ) {
+  getChatMessagesWithTotal(chatId: string, pagination: PaginationParams) {
     return this.prisma.$transaction([
       this.prisma.message.findMany({
         ...pagination,
@@ -48,10 +53,7 @@ export class ChatRepository {
     ]);
   }
 
-  async getUserChatsWithTotal(
-    userId: string,
-    pagination: { skip: number; take: number },
-  ) {
+  getUserChatsWithTotal(userId: string, pagination: PaginationParams) {
     return this.prisma.$transaction([
       this.prisma.chat.findMany({
         ...pagination,

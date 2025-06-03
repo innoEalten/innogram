@@ -10,38 +10,50 @@ import {
 } from '@app/shared';
 import { PostRepository } from './post.repository';
 import { ImageService } from '../image/image.service';
-import { PostNotFoundException } from './exceptions';
-import { PrismaService } from '@app/prisma';
+import { PostNotFoundException, AtLeastOneImageException } from './exceptions';
+import { Transactional } from '@nestjs-cls/transactional';
+import { ImageNotFoundException } from '../image/exceptions';
 
 @Injectable()
 export class PostService {
   constructor(
     private readonly postRepository: PostRepository,
     private readonly imageService: ImageService,
-    private readonly prismaService: PrismaService,
   ) {}
 
-  create(
+  private validateImageRemoval(post: Post, removeImageIds: string[]) {
+    const existingImageIds = post.images.map(({ id }) => id);
+
+    if (removeImageIds.some((id) => !existingImageIds.includes(id))) {
+      throw new ImageNotFoundException();
+    }
+
+    if (existingImageIds.length - removeImageIds.length < 1) {
+      throw new AtLeastOneImageException();
+    }
+  }
+
+  @Transactional()
+  async create(
     createPostDto: CreatePostDto,
     userId: string,
     files: Express.Multer.File[],
   ) {
-    return this.prismaService.runInTransaction(async () => {
-      const newPost = await this.postRepository.create({
-        ...createPostDto,
-        authorId: userId,
-      });
-
-      await this.imageService.uploadImages(
-        files,
-        FileSubdirectory.POSTS,
-        newPost.id,
-      );
-
-      return newPost;
+    const newPost = await this.postRepository.create({
+      ...createPostDto,
+      authorId: userId,
     });
+
+    await this.imageService.uploadImages(
+      files,
+      FileSubdirectory.POSTS,
+      newPost.id,
+    );
+
+    return newPost;
   }
 
+  @Transactional()
   async findMany(
     paginationQueryDto: PaginationQueryDto,
   ): Promise<PaginationResponse<Post>> {
@@ -65,38 +77,36 @@ export class PostService {
     return post;
   }
 
-  update(postId: string, { removeImageIds, body, title }: UpdatePostDto) {
-    return this.prismaService.runInTransaction(async () => {
-      if (removeImageIds?.length) {
-        for (const imageId of removeImageIds) {
-          const image = await this.imageService.findOne(imageId);
+  @Transactional()
+  async update(postId: string, { removeImageIds, body, title }: UpdatePostDto) {
+    const post = await this.findOne(postId);
 
-          if (image.postId === postId) {
-            await this.imageService.deleteImage(image);
-          }
-        }
-      }
+    if (removeImageIds?.length) {
+      this.validateImageRemoval(post, removeImageIds);
 
-      if (body || title) {
-        await this.postRepository.update(postId, {
-          body,
-          title,
-        });
-      }
+      await this.imageService.deleteImages(
+        post.images.filter(({ id }) => removeImageIds.includes(id)),
+      );
+    }
 
-      return this.postRepository.findOne(postId);
-    });
+    if (body || title) {
+      await this.postRepository.update(postId, {
+        body,
+        title,
+      });
+    }
+
+    return this.findOne(postId);
   }
 
-  delete(postId: string) {
-    return this.prismaService.runInTransaction(async () => {
-      const post = await this.findOne(postId);
+  @Transactional()
+  async delete(postId: string) {
+    const post = await this.findOne(postId);
 
-      if (post.images.length > 0) {
-        await this.imageService.deleteImages(post.images);
-      }
+    if (post.images.length) {
+      await this.imageService.deleteImages(post.images);
+    }
 
-      return this.postRepository.delete(postId);
-    });
+    return this.postRepository.delete(postId);
   }
 }

@@ -32,7 +32,6 @@ import { postImagesFileValidationPipe } from './pipes/post-images-validation.pip
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiBodyUploadPost } from './decorators';
 import { PostOwnerGuard } from './guards';
-import { MinioCompensationInterceptor } from '../minio/compensation';
 
 @Controller('posts')
 @UseGuards(JwtGuard)
@@ -46,10 +45,7 @@ export class PostController {
   @ApiConsumes('multipart/form-data')
   @ApiResponse({ status: 201, description: 'Post created successfully' })
   @ApiBodyUploadPost
-  @UseInterceptors(
-    FilesInterceptor('files', FileConfig.MAX_FILE_NUMBER),
-    MinioCompensationInterceptor,
-  )
+  @UseInterceptors(FilesInterceptor('files', FileConfig.MAX_FILE_NUMBER))
   create(
     @Body() createPostDto: CreatePostDto,
     @User() { _id }: UserType,
@@ -83,7 +79,6 @@ export class PostController {
   @ApiOperation({ summary: 'Update a post (optionally delete images)' })
   @ApiResponse({ status: 200, description: 'Post updated successfully' })
   @UseGuards(PostOwnerGuard)
-  @UseInterceptors(MinioCompensationInterceptor)
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updatePostDto: UpdatePostDto,
@@ -98,7 +93,6 @@ export class PostController {
     description: 'Post deleted successfully',
   })
   @UseGuards(PostOwnerGuard)
-  @UseInterceptors(MinioCompensationInterceptor)
   delete(@Param('id', ParseUUIDPipe) id: string) {
     return this.postService.delete(id);
   }

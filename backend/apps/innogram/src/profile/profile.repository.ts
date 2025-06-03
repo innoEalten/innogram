@@ -1,13 +1,13 @@
 import { PrismaService } from '@app/prisma';
 import { Injectable } from '@nestjs/common';
 import { CreateProfileDto } from './dto/create-profile.dto';
-import { UpdateProfileDto } from './dto/update-profile.dto';
+import { type UpdateProfileData } from './types';
 
 @Injectable()
 export class ProfileRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findOne(id: string) {
+  findOne(id: string) {
     return this.prisma.profile.findUnique({
       where: { userId: id },
       include: {
@@ -20,15 +20,15 @@ export class ProfileRepository {
     });
   }
 
-  async create(data: CreateProfileDto) {
+  create(data: CreateProfileDto) {
     return this.prisma.profile.create({ data });
   }
 
-  async update(id: string, data: UpdateProfileDto & { imageId?: string }) {
+  update(id: string, data: UpdateProfileData) {
     return this.prisma.profile.update({ where: { userId: id }, data });
   }
 
-  async delete(id: string) {
+  delete(id: string) {
     return this.prisma.profile.delete({ where: { userId: id } });
   }
 }

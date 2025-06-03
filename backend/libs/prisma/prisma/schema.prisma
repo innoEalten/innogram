@@ -19,6 +19,8 @@ model Profile {
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("profile")
 }
 
 model Post {
@@ -30,6 +32,10 @@ model Post {
 
   images Image[]
   author Profile @relation(fields: [authorId], references: [userId])
+
+  @@map("post")
+  @@index([authorId], name: "idx_post_author_id")
+  @@index([createdAt], name: "idx_post_created_at")
 }
 
 model File {
@@ -37,6 +43,28 @@ model File {
   url String
 
   image Image?
+  fileOutbox FileOutbox[]
+
+  @@map("file")
+  @@index([id], name: "idx_file_id")
+}
+
+enum FileAction {
+  MOVE_TO_PERMANENT_STORAGE
+  DELETE_FROM_PERMANENT_STORAGE
+}
+
+model FileOutbox {
+  id         String   @id @default(uuid())
+  fileId     String   @map("file_id")
+  action     FileAction
+  targetPath String   @map("target_path")
+  createdAt  DateTime @default(now()) @map("created_at")
+  processed  Boolean  @default(false)
+
+  file File @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@map("file_outbox")
 }
 
 model Image {
@@ -47,4 +75,7 @@ model Image {
   profile Profile?
   post    Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
   file    File    @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@map("image")
+  @@index([postId], name: "idx_image_post_id")
 }

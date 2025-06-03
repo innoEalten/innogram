@@ -1,4 +1,4 @@
-export type CreateImageInput = {
+export type CreateImageData = {
   fileId: string;
   postId?: string;
 };

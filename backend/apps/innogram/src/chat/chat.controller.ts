@@ -13,6 +13,7 @@ import { PaginationQueryDto, User as UserType } from '@app/shared';
 import { JwtGuard } from '../jwt/guards/jwt.guard';
 import { InitChatDto } from './dto/init-chat.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { ChatParamsDto } from './dto/chat-params.dto';
 
 @Controller('chats')
 @UseGuards(JwtGuard)
@@ -38,9 +39,9 @@ export class ChatController {
 
   @Get('messages/:chatId')
   getChatMessages(
-    @Param('chatId') chatId: string,
+    @Param() params: ChatParamsDto,
     @Query() paginationQueryDto: PaginationQueryDto,
   ) {
-    return this.chatService.getChatMessages(chatId, paginationQueryDto);
+    return this.chatService.getChatMessages(params.chatId, paginationQueryDto);
   }
 }

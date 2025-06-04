@@ -3,7 +3,7 @@ import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { ValidateTokenResponseDto } from '@app/shared/dto/auth-response.dto';
-import { InvalidTokenException } from '../exceptions/invalid-token.ecxeption';
+import { InvalidTokenException } from '../exceptions/invalid-token.exception';
 
 @Injectable()
 export class JwtStrategy {

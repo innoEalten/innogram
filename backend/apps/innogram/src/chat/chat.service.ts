@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ChatRepository } from './chat.repository';
 import {
   buildPaginationResponse,
@@ -37,6 +37,10 @@ export class ChatService {
   }
 
   async getChatMessages(chatId: string, { page, limit }: PaginationQueryDto) {
+    const chat = await this.chatRepository.getChatById(chatId);
+
+    if (!chat) throw new BadRequestException(ChatErrorMessages.INVALID_CHAT);
+
     const [data, total] = await this.chatRepository.getChatMessagesWithTotal(
       chatId,
       getPaginationParams({ page, limit }),

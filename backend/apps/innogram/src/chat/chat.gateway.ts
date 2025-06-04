@@ -8,7 +8,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { WsAuthGuard } from '../jwt/guards/ws-jwt.guard';
-import { WsInvalidTokenException } from '../jwt/exceptions/invalid-token.ecxeption';
+import { WsInvalidTokenException } from '../jwt/exceptions/invalid-token.exception';
 import { JwtStrategy } from '../jwt/strategies/jwt.strategy';
 import { ChatService } from './chat.service';
 import { WsUser } from '../auth/decorators/ws-user.decorator';

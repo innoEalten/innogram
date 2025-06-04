@@ -5,7 +5,6 @@ import { FileSubdirectory } from '@app/shared';
 import { ConfigService } from '@nestjs/config';
 import { createHash } from 'crypto';
 import { extname } from 'path';
-import { MinioCompensationService } from './compensation';
 
 @Injectable()
 export class MinioService {
@@ -14,7 +13,6 @@ export class MinioService {
   constructor(
     @InjectMinio() private readonly minioClient: Client,
     private readonly configService: ConfigService,
-    private readonly compensationService: MinioCompensationService,
   ) {
     this._bucketName =
       this.configService.getOrThrow<string>('MINIO_BUCKET_NAME');
@@ -28,17 +26,18 @@ export class MinioService {
     return `${hash}${ext}`;
   }
 
-  private async uploadSingleFile(
+  private async uploadTmpSingleFile(
     file: Express.Multer.File,
     subdirectory: FileSubdirectory,
     index: number = 0,
   ): Promise<string> {
     const filename = this.generateFileName(file.originalname, index);
     const filePath = `${subdirectory}/${filename}`;
+    const tmpFilePath = `tmp/${filePath}`;
 
     await this.minioClient.putObject(
       this._bucketName,
-      filePath,
+      tmpFilePath,
       file.buffer,
       file.size,
       {
@@ -46,57 +45,49 @@ export class MinioService {
       },
     );
 
-    this.compensationService.register(async () => {
-      await this.minioClient.removeObject(this._bucketName, filePath);
-    });
-
-    return filePath;
+    return tmpFilePath;
   }
 
   private async removeSingleFile(filePath: string): Promise<void> {
-    const trashPath = `trash/${filePath}`;
-
-    await this.minioClient.copyObject(
-      this._bucketName,
-      trashPath,
-      `/${this._bucketName}/${filePath}`,
-    );
-
-    this.compensationService.register(async () => {
-      await this.minioClient.copyObject(
-        this._bucketName,
-        filePath,
-        `/${this._bucketName}/${trashPath}`,
-      );
-      await this.minioClient.removeObject(this._bucketName, trashPath);
-    });
-
     await this.minioClient.removeObject(this._bucketName, filePath);
   }
 
-  async uploadObject(
+  async moveObjectToPermanentStorage(
+    targetPath: string,
+    tmpFilePath: string,
+  ): Promise<void> {
+    await this.minioClient.copyObject(
+      this._bucketName,
+      targetPath,
+      `/${this._bucketName}/${tmpFilePath}`,
+    );
+
+    await this.minioClient.removeObject(this._bucketName, tmpFilePath);
+  }
+
+  uploadTmpObject(
     file: Express.Multer.File,
     subdirectory: FileSubdirectory,
   ): Promise<string> {
-    return this.uploadSingleFile(file, subdirectory);
+    return this.uploadTmpSingleFile(file, subdirectory);
   }
 
-  async uploadObjects(
+  uploadTmpObjects(
     files: Express.Multer.File[],
     subdirectory: FileSubdirectory,
   ): Promise<string[]> {
     return Promise.all(
       files.map((file, index) =>
-        this.uploadSingleFile(file, subdirectory, index),
+        this.uploadTmpSingleFile(file, subdirectory, index),
       ),
     );
   }
 
-  async removeObject(filePath: string): Promise<void> {
+  removeObject(filePath: string): Promise<void> {
     return this.removeSingleFile(filePath);
   }
 
-  async removeObjects(files: string[]): Promise<void[]> {
+  removeObjects(files: string[]): Promise<void[]> {
     return Promise.all(
       files.map(async (filePath) => {
         await this.removeSingleFile(filePath);

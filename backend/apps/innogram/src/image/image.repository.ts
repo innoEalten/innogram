@@ -1,34 +1,37 @@
-import { PrismaService } from '@app/prisma';
 import { Injectable } from '@nestjs/common';
-import { CreateImageInput } from './types/create-image-input';
+import { CreateImageData } from './types';
+import { TransactionHost } from '@nestjs-cls/transactional';
+import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 
 @Injectable()
 export class ImageRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly txHost: TransactionHost<TransactionalAdapterPrisma>,
+  ) {}
 
   findOne(id: string) {
-    return this.prisma.getClient().image.findUnique({
+    return this.txHost.tx.image.findUnique({
       where: { id },
       include: { file: true },
     });
   }
 
-  create(data: CreateImageInput) {
-    return this.prisma.getClient().image.create({ data });
+  create(data: CreateImageData) {
+    return this.txHost.tx.image.create({ data });
   }
 
-  createMany(data: CreateImageInput[]) {
-    return this.prisma.getClient().image.createManyAndReturn({ data });
+  createMany(data: CreateImageData[]) {
+    return this.txHost.tx.image.createManyAndReturn({ data });
   }
 
   delete(id: string) {
-    return this.prisma.getClient().image.delete({
+    return this.txHost.tx.image.delete({
       where: { id },
     });
   }
 
   deleteMany(ids: string[]) {
-    return this.prisma.getClient().image.deleteMany({
+    return this.txHost.tx.image.deleteMany({
       where: { id: { in: ids } },
     });
   }

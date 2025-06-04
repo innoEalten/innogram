@@ -3,7 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import { MINIO_TOKEN } from './minio.decorator';
 import { minioConfig } from './config/minio.config';
 import { MinioService } from './minio.service';
-import { MinioCompensationService } from './compensation/minio-compensation.service';
 import { APP_FILTER } from '@nestjs/core';
 import { MinioExceptionFilter } from './filters/minio-exception.filter';
 
@@ -11,7 +10,6 @@ import { MinioExceptionFilter } from './filters/minio-exception.filter';
 @Module({
   providers: [
     MinioService,
-    MinioCompensationService,
     {
       inject: [ConfigService],
       provide: 'MINIO_CLIENT',
@@ -27,6 +25,6 @@ import { MinioExceptionFilter } from './filters/minio-exception.filter';
       useClass: MinioExceptionFilter,
     },
   ],
-  exports: [MINIO_TOKEN, MinioService, MinioCompensationService],
+  exports: [MINIO_TOKEN, MinioService],
 })
 export class MinioModule {}

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { FileService } from '../file/file.service';
+import { FileService } from '../file';
 import { type Image, FileSubdirectory } from '@app/shared';
 import { ImageRepository } from './image.repository';
 import { ImageNotFoundException } from './exceptions';
@@ -26,10 +26,13 @@ export class ImageService {
     subdirectory: FileSubdirectory,
     postId?: string,
   ) {
-    const uploadedFile = await this.fileService.uploadFile(file, subdirectory);
+    const tmpUploadedFile = await this.fileService.uploadTmpFile(
+      file,
+      subdirectory,
+    );
 
     return this.imageRepository.create({
-      fileId: uploadedFile.id,
+      fileId: tmpUploadedFile.id,
       postId,
     });
   }
@@ -39,14 +42,14 @@ export class ImageService {
     subdirectory: FileSubdirectory,
     postId?: string,
   ) {
-    const uploadedFiles = await this.fileService.uploadFiles(
+    const tmpUploadedFiles = await this.fileService.uploadTmpFiles(
       files,
       subdirectory,
     );
 
     return this.imageRepository.createMany(
-      uploadedFiles.map((file) => ({
-        fileId: file.id,
+      tmpUploadedFiles.map((tmpFile) => ({
+        fileId: tmpFile.id,
         postId,
       })),
     );
@@ -54,7 +57,7 @@ export class ImageService {
 
   deleteImage(image: Image) {
     return Promise.all([
-      this.fileService.deleteFile(image.file),
+      this.fileService.addFileToDelete(image.file),
       this.imageRepository.delete(image.id),
     ]);
   }
@@ -64,7 +67,7 @@ export class ImageService {
     const filesToDelete = images.map((image) => image.file);
 
     return Promise.all([
-      this.fileService.deleteFiles(filesToDelete),
+      this.fileService.addFilesToDelete(filesToDelete),
       this.imageRepository.deleteMany(imageIds),
     ]);
   }

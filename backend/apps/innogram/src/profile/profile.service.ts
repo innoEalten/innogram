@@ -13,7 +13,7 @@ export class ProfileService {
     private readonly imageService: ImageService,
   ) {}
 
-  async createProfile(data: CreateProfileDto) {
+  createProfile(data: CreateProfileDto) {
     return this.profileRepository.create(data);
   }
 
@@ -46,11 +46,11 @@ export class ProfileService {
     return updatedProfile;
   }
 
-  async updateProfile(id: string, data: UpdateProfileDto) {
+  updateProfile(id: string, data: UpdateProfileDto) {
     return this.profileRepository.update(id, data);
   }
 
-  async deleteProfile(id: string) {
+  deleteProfile(id: string) {
     return this.profileRepository.delete(id);
   }
 }

@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { FileService } from './file.service';
 import { MinioModule } from '../minio';
-import { PrismaModule } from '@app/prisma';
 import { FileRepository } from './file.repository';
+import { FileOutboxRepository } from './file-outbox.repository';
 
 @Module({
-  imports: [MinioModule, PrismaModule],
-  providers: [FileService, FileRepository],
-  exports: [FileService],
+  imports: [MinioModule],
+  providers: [FileService, FileRepository, FileOutboxRepository],
+  exports: [FileService, FileRepository],
 })
 export class FileModule {}

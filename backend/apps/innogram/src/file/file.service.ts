@@ -2,9 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { FileSubdirectory } from '@app/shared';
 import { MinioService } from '../minio/minio.service';
 import { FileRepository } from './file.repository';
-import { type File } from '@app/shared';
 import { FileOutboxRepository } from './file-outbox.repository';
-import { FileAction } from '@prisma/client';
+import { FileAction, type File } from '@prisma/client';
 import { type FileOutboxWithFile } from './utils/file-outbox-with-file-select.util';
 import { Transactional } from '@nestjs-cls/transactional';
 

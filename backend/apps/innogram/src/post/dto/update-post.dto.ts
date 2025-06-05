@@ -1,4 +1,4 @@
-import { PartialType } from '@nestjs/mapped-types';
+import { PartialType, ApiProperty } from '@nestjs/swagger';
 import { CreatePostDto } from './create-post.dto';
 import {
   Validate,
@@ -27,6 +27,10 @@ export class UpdatePostDto extends PartialType(CreatePostDto) {
   @Validate(AtLeastOneFieldConstraint)
   _atLeastOneField?: unknown;
 
+  @ApiProperty({
+    description: 'Array of image IDs to remove from the post',
+    example: ['123e4567-e89b-12d3-a456-426614174000'],
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })

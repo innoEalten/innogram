@@ -39,7 +39,6 @@ model Post {
 
   @@map("post")
   @@index([authorId], name: "idx_post_author_id")
-  @@index([createdAt], name: "idx_post_created_at")
 }
 
 model File {
@@ -50,7 +49,6 @@ model File {
   fileOutbox FileOutbox[]
 
   @@map("file")
-  @@index([id], name: "idx_file_id")
 }
 
 enum FileAction {

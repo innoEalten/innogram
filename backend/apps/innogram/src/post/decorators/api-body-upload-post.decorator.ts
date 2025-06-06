@@ -6,6 +6,7 @@ export const ApiBodyUploadPost: MethodDecorator = (
   descriptor,
 ) => {
   ApiBody({
+    description: 'Create a new post with images',
     schema: {
       type: 'object',
       properties: {

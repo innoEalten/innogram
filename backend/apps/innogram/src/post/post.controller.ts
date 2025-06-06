@@ -21,6 +21,7 @@ import {
   ApiTags,
   ApiOperation,
   ApiResponse,
+  ApiBody,
 } from '@nestjs/swagger';
 import { User } from '../auth/decorators/user.decorator';
 import {
@@ -78,6 +79,11 @@ export class PostController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update a post (optionally delete images)' })
   @ApiResponse({ status: 200, description: 'Post updated successfully' })
+  @ApiBody({
+    type: UpdatePostDto,
+    description:
+      'Update post with optional image deletion. At least one field must be provided',
+  })
   @UseGuards(PostOwnerGuard)
   update(
     @Param('id', ParseUUIDPipe) id: string,

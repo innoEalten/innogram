@@ -3,7 +3,7 @@ import { Request } from 'express';
 import { JwtStrategy } from '../strategies/jwt.strategy';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../../auth/decorators/public.decorator';
-import { InvalidTokenException } from '../exceptions/invalid-token.exception';
+import { InvalidTokenException } from '../exeptions/invalid-token.exeption';
 import { RequestWithUser } from '@app/shared';
 
 @Injectable()
@@ -31,7 +31,7 @@ export class JwtGuard implements CanActivate {
     return true;
   }
 
-  extractTokenFromHeader(req: Request) {
+  private extractTokenFromHeader(req: Request): string {
     const authHeader = req.headers['authorization'];
     if (!authHeader) {
       throw new InvalidTokenException();

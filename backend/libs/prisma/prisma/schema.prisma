@@ -113,5 +113,4 @@ model Message {
   @@map("messages")
   @@index([chatId], name: "idx_message_chat_id")
   @@index([senderId], name: "idx_message_sender_id")
-  @@index([createdAt], name: "idx_message_created_at")
 }

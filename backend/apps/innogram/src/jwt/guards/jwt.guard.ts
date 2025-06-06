@@ -3,7 +3,7 @@ import { Request } from 'express';
 import { JwtStrategy } from '../strategies/jwt.strategy';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../../auth/decorators/public.decorator';
-import { InvalidTokenException } from '../exeptions/invalid-token.exeption';
+import { InvalidTokenException } from '../exceptions/invalid-token.exception';
 import { RequestWithUser } from '@app/shared';
 
 @Injectable()

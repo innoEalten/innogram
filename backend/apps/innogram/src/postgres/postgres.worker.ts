@@ -29,7 +29,7 @@ export class PostgresWorker implements OnModuleInit, OnModuleDestroy {
 
     await this.client.query(`LISTEN ${C.LISTEN_CHANNEL}`);
 
-    this.client.on('notification', async ({ payload: fileOutboxId }) => {
+    this.client.on('notification', ({ payload: fileOutboxId }) => {
       this.logger.log(`${C.STARTED_PROCESSING_PREFIX} ${fileOutboxId}`);
 
       if (!fileOutboxId) {
@@ -37,7 +37,12 @@ export class PostgresWorker implements OnModuleInit, OnModuleDestroy {
         return;
       }
 
-      await this.fileService.processFileOutbox(fileOutboxId);
+      this.fileService.processFileOutbox(fileOutboxId).catch((err) => {
+        this.logger.error(
+          `${C.ERROR_PROCESSING_FILE_OUTBOX} ${fileOutboxId}`,
+          err,
+        );
+      });
     });
 
     this.client.on('error', (err) => {

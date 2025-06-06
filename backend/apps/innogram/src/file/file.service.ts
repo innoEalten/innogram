@@ -6,6 +6,7 @@ import { FileOutboxRepository } from './file-outbox.repository';
 import { FileAction, type File } from '@prisma/client';
 import { type FileOutboxWithFile } from './utils/file-outbox-with-file-select.util';
 import { Transactional } from '@nestjs-cls/transactional';
+import { FileOutboxNotFoundError } from '../exceptions';
 
 @Injectable()
 export class FileService {
@@ -107,7 +108,7 @@ export class FileService {
     const outboxWithFile =
       await this.fileOutboxRepository.findOneWithFile(fileOutboxId);
 
-    if (!outboxWithFile) return;
+    if (!outboxWithFile) throw new FileOutboxNotFoundError();
 
     switch (outboxWithFile.action) {
       case FileAction.MOVE_TO_PERMANENT_STORAGE:

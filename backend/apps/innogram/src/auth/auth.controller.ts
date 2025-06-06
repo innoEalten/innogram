@@ -9,10 +9,11 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginUserDto, CreateUserWithProfileDto, Token } from '@app/shared';
-import { AuthGuard } from './guards/jwt.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { Response } from 'express';
 import { Cookies } from './decorators/cookie.decorator';
+import { JwtGuard } from '../jwt/guards/jwt.guard';
+import { RefreshTokenCookieDto } from './dto/refresh-token-cookie.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -37,7 +38,6 @@ export class AuthController {
 
     return {
       user: result.user,
-      profile: result.profile,
       tokens: { access: result.tokens.access },
     };
   }
@@ -54,7 +54,6 @@ export class AuthController {
 
     return {
       user: result.user,
-      profile: result.profile,
       tokens: {
         access: result.tokens.access,
       },
@@ -62,7 +61,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtGuard)
   @ApiBearerAuth()
   @HttpCode(200)
   logout(@Headers('Authorization') authorization: string) {
@@ -75,7 +74,7 @@ export class AuthController {
   @HttpCode(200)
   async refreshAccessToken(
     @Res({ passthrough: true }) res: Response,
-    @Cookies('refreshToken') refreshToken: string,
+    @Cookies('refreshToken') { cookie: refreshToken }: RefreshTokenCookieDto,
   ) {
     const result = await this.authService.refreshAccessToken(refreshToken);
 

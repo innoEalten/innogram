@@ -8,11 +8,72 @@ datasource db {
 }
 
 model Profile {
-  userId         String          @id @map("user_id")
-  name            String          
-  phone           String
-  bio             String?
+  userId String @id @map("user_id")
+  name    String
+  phone   String
+  bio     String?
+  posts   Post[]
 
-  created_at      DateTime        @default(now())
-  updated_at      DateTime        @updatedAt @default(now())
+  imageId String? @unique @map("image_id")
+  image   Image?  @relation(fields: [imageId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  @@map("profile")
+}
+
+model Post {
+  id         String   @id @default(uuid())
+  title      String
+  body       String
+  createdAt DateTime @default(now()) @map("created_at")
+  authorId  String  @map("author_id") 
+
+  images Image[]
+  author Profile @relation(fields: [authorId], references: [userId])
+
+  @@map("post")
+  @@index([authorId], name: "idx_post_author_id")
+}
+
+model File {
+  id  String @id @default(uuid())
+  url String
+
+  image Image?
+  fileOutbox FileOutbox[]
+
+  @@map("file")
+}
+
+enum FileAction {
+  MOVE_TO_PERMANENT_STORAGE
+  DELETE_FROM_PERMANENT_STORAGE
+}
+
+model FileOutbox {
+  id         String   @id @default(uuid())
+  fileId     String   @map("file_id")
+  action     FileAction
+  targetPath String   @map("target_path")
+  createdAt  DateTime @default(now()) @map("created_at")
+  processed  Boolean  @default(false)
+
+  file File @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@map("file_outbox")
+}
+
+model Image {
+  id      String  @id @default(uuid())
+  fileId String @unique @map("file_id")
+  postId String? @map("post_id")
+
+  profile Profile?
+  post    Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  file    File    @relation(fields: [fileId], references: [id], onDelete: Cascade)
+
+  @@map("image")
+  @@index([postId], name: "idx_image_post_id")
 }

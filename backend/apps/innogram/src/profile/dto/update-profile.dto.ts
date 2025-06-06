@@ -1,6 +1,19 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateProfileDto } from './create-profile.dto';
+import { IsOptional, IsPhoneNumber } from 'class-validator';
+import { IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+export class UpdateProfileDto {
+  @IsString()
+  @IsOptional()
+  @ApiProperty()
+  name?: string;
 
-export class UpdateProfileDto extends PartialType(CreateProfileDto) {
-  userId: string;
+  @IsPhoneNumber()
+  @IsOptional()
+  @ApiProperty()
+  phone?: string;
+
+  @IsString()
+  @IsOptional()
+  @ApiProperty()
+  bio?: string;
 }

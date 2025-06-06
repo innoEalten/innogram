@@ -10,8 +10,9 @@ import {
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
-import { ProfileService } from '../profile/profile.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CreateUserDto } from '@app/shared/dto/create-user.dto';
+import { CreateProfileDto } from '../profile/dto/create-profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +20,7 @@ export class AuthService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
-    private readonly profileService: ProfileService,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     this.authServiceUrl =
       this.configService.getOrThrow<string>('AUTH_SERVICE_URL');
@@ -40,13 +41,14 @@ export class AuthService {
       ),
     );
 
-    const profile = await this.profileService.createProfile({
-      userId: createdUser._id,
-      name: createUserDto.name,
-      phone: createUserDto.phone,
-    });
+    const profileData = new CreateProfileDto();
+    profileData.userId = createdUser._id;
+    profileData.name = createUserDto.name;
+    profileData.phone = createUserDto.phone;
 
-    return { user, profile, tokens };
+    this.eventEmitter.emit('user.created', profileData);
+
+    return { user: createdUser, tokens };
   }
 
   async login(loginUserDto: LoginUserDto) {
@@ -59,9 +61,7 @@ export class AuthService {
       ),
     );
 
-    const profile = await this.profileService.getProfile(user._id);
-
-    return { user, profile, tokens };
+    return { user, tokens };
   }
 
   async logout(token: string) {

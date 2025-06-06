@@ -4,12 +4,11 @@ import { AuthController } from './auth.controller';
 import { HttpModule } from '@nestjs/axios';
 import { APP_FILTER } from '@nestjs/core';
 import { AxiosExceptionFilter } from './exceptions/axios-exception.filter';
-import { JwtStrategy } from './strategies/jwt.strategy';
 import { PrismaModule } from '@app/prisma';
-import { ProfileModule } from '../profile/profile.module';
+import { JwtModule } from '../jwt/jwt.module';
 
 @Module({
-  imports: [HttpModule, PrismaModule, ProfileModule],
+  imports: [HttpModule, PrismaModule, JwtModule],
   controllers: [AuthController],
   providers: [
     AuthService,
@@ -17,7 +16,6 @@ import { ProfileModule } from '../profile/profile.module';
       provide: APP_FILTER,
       useClass: AxiosExceptionFilter,
     },
-    JwtStrategy,
   ],
 })
 export class AuthModule {}

@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
+import { ValidateTokenResponseDto } from '@app/shared/dto/auth-response.dto';
+import { InvalidTokenException } from '../exeptions/invalid-token.exeption';
 
 @Injectable()
 export class JwtStrategy {
@@ -15,9 +17,9 @@ export class JwtStrategy {
       this.configService.getOrThrow<string>('AUTH_SERVICE_URL');
   }
 
-  async validateRequest(token: string): Promise<boolean> {
-    const { data: isValid } = await firstValueFrom(
-      this.httpService.post<boolean>(
+  async validateRequest(token: string) {
+    const { data } = await firstValueFrom(
+      this.httpService.post<ValidateTokenResponseDto>(
         `${this.authServiceUrl}/validate-token`,
         {},
         {
@@ -28,6 +30,10 @@ export class JwtStrategy {
       ),
     );
 
-    return isValid;
+    if (!data) {
+      throw new InvalidTokenException();
+    }
+
+    return data;
   }
 }

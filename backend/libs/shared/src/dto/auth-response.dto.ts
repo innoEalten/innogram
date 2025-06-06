@@ -24,6 +24,7 @@ export interface AuthResponseDto {
 export type RegisterResponseDto = AuthResponseDto;
 export type LoginResponseDto = AuthResponseDto;
 export type LogoutResponseDto = object;
+export type ValidateTokenResponseDto = User;
 
 export interface RefreshTokenResponseDto {
   tokens: Tokens;

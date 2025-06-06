@@ -12,8 +12,10 @@ ARG APP
 WORKDIR /app
 COPY --from=build /app/dist/apps/${APP} ./dist
 COPY package*.json ./
+COPY --from=build /app/libs/prisma ./libs/prisma
 ENV NODE_ENV=production
 RUN npm ci
+RUN npm run prisma:generate
 EXPOSE 3000
 CMD ["node", "dist/main"]
 

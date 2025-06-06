@@ -1,5 +1,5 @@
-import { AUTH_ERROR_MESSAGES } from '@app/shared';
-import { ResponseErrorData } from '@app/shared/types/response-error-data';
+import { AuthErrorMessages, ResponseErrorData } from '@app/shared';
+
 import {
   ExceptionFilter,
   Catch,
@@ -14,7 +14,7 @@ export class AxiosExceptionFilter implements ExceptionFilter {
 
     const responseData: ResponseErrorData = {
       statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      message: AUTH_ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
+      message: AuthErrorMessages.INTERNAL_SERVER_ERROR,
     };
 
     if (axiosResponse) {

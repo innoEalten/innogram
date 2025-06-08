@@ -5,3 +5,4 @@ export * from './file.constant';
 export * from './profile.constant';
 export * from './image.constant';
 export * from './minio.constant';
+export * from './postgres.constant';

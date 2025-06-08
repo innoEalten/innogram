@@ -7,7 +7,7 @@ import {
 import { Client } from 'pg';
 import { ConfigService } from '@nestjs/config';
 import { FileService } from '../file';
-import { PostgresWorkerConstants as C } from './constants/postgres.constant';
+import { PostgresWorkerConstants as C } from '@app/shared/constants';
 
 @Injectable()
 export class PostgresWorker implements OnModuleInit, OnModuleDestroy {

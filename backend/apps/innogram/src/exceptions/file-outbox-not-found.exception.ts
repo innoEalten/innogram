@@ -1,8 +1,8 @@
-import { FileOutboxErrorMessages } from '@app/shared';
+import { PostgresWorkerConstants } from '@app/shared/constants';
 
 export class FileOutboxNotFoundError extends Error {
   constructor() {
-    super(FileOutboxErrorMessages.NOT_FOUND);
+    super(PostgresWorkerConstants.FILE_OUTBOX_NOT_FOUND);
     this.name = 'FileOutboxNotFoundError';
   }
 }

@@ -11,6 +11,7 @@ import { ClsPluginTransactional } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import { PostgresModule } from './postgres';
 
+import { ChatModule } from './chat/chat.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -35,6 +36,7 @@ import { PostgresModule } from './postgres';
     AuthModule,
     ProfileModule,
     PostModule,
+    ChatModule,
   ],
   controllers: [],
   providers: [],

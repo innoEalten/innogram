@@ -24,10 +24,14 @@ services:
     volumes:
       - ./docker/mongodata:/data/db
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
-      interval: 10s
-      timeout: 30s
-      retries: 5
+      test:
+        [
+          "CMD-SHELL",
+          'mongosh --eval ''db.adminCommand("ping")'' --quiet || exit 1',
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
       start_period: 40s
 
   redis:

@@ -92,7 +92,7 @@ model Chat {
   
   messages Message[]
 
-  @@map("chats")
+  @@map("chat")
 }
 
 model Message {
@@ -108,7 +108,7 @@ model Message {
   chat Chat @relation(fields: [chatId], references: [id])
   sender Profile @relation(fields: [senderId], references: [userId])
 
-  @@map("messages")
+  @@map("message")
   @@index([chatId], name: "idx_message_chat_id")
   @@index([senderId], name: "idx_message_sender_id")
 }

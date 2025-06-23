@@ -1,4 +1,4 @@
 export {
   type FileRepositoryInterface,
-  FileRepositoryInterfaceToken,
+  FileRepositoryToken,
 } from './file.repository.interface';

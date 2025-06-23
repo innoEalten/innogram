@@ -8,14 +8,14 @@ import { Transactional } from '@nestjs-cls/transactional';
 import { FileOutboxNotFoundError } from '../exceptions';
 import {
   type FileRepositoryInterface,
-  FileRepositoryInterfaceToken,
+  FileRepositoryToken,
 } from '../repositories';
 
 @Injectable()
 export class FileService {
   constructor(
     private readonly minioService: MinioService,
-    @Inject(FileRepositoryInterfaceToken)
+    @Inject(FileRepositoryToken)
     private readonly fileRepository: FileRepositoryInterface,
     private readonly fileOutboxRepository: FileOutboxRepository,
   ) {}

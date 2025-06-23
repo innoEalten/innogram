@@ -5,11 +5,11 @@ import { FileOutboxRepository } from '../../file-outbox.repository';
 import { FileAction, type File } from '@prisma/client';
 import { type FileOutboxWithFile } from '../../utils/file-outbox-with-file-select.util';
 import { Transactional } from '@nestjs-cls/transactional';
-import { FileOutboxNotFoundError } from '../exceptions';
+import { FileOutboxNotFoundError } from '../../domain/exceptions';
 import {
   type FileRepositoryInterface,
   FileRepositoryToken,
-} from '../repositories';
+} from '../../domain/repositories';
 
 @Injectable()
 export class FileService {

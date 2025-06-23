@@ -1,11 +1,11 @@
-import { CreateFileDto } from '../../application/dto/create-file.dto';
-import { UpdateFileDto } from '../../application/dto/update-file.dto';
+import { CreateFileDto, UpdateFileDto } from '../../application/dto';
+import { FileEntity } from '../entities';
 
-export const FileRepositoryToken = Symbol('FileRepositoryInterface');
+export const FileRepositoryToken = Symbol('FileRepositoryToken');
+
 export interface FileRepositoryInterface {
-  updateOne(id: string, data: UpdateFileDto): any;
-  create(data: CreateFileDto): any;
-  createMany(data: CreateFileDto[]): any;
-  delete(id: string): any;
-  deleteMany(ids: string[]): any;
+  updateOne(id: string, data: UpdateFileDto): Promise<void>;
+  create(data: CreateFileDto): Promise<FileEntity>;
+  createMany(data: CreateFileDto[]): Promise<FileEntity[]>;
+  delete(id: string): Promise<void>;
 }

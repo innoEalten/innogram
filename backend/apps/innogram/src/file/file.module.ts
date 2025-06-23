@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { FileService } from './domain/services/file.service';
+import { FileService } from './application/services';
 import { MinioModule } from '../minio';
-import { PrismaFileRepository } from './infrastructure/repositories/prisma-file.repository';
+import { PrismaFileRepository } from './infrastructure/repositories';
 import { FileOutboxRepository } from './file-outbox.repository';
 import { FileRepositoryToken } from './domain/repositories';
 

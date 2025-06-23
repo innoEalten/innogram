@@ -2,6 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { TransactionHost } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import { type FileRepositoryInterface } from '../../domain/repositories';
+import { PrismaFileMapper } from '../mappers';
+import { FileEntity } from '../../domain/entities';
+import { CreateFileDto, UpdateFileDto } from '../../application/dto';
 
 @Injectable()
 export class PrismaFileRepository implements FileRepositoryInterface {
@@ -9,34 +12,26 @@ export class PrismaFileRepository implements FileRepositoryInterface {
     private readonly txHost: TransactionHost<TransactionalAdapterPrisma>,
   ) {}
 
-  updateOne(id: string, data: { url: string }) {
-    return this.txHost.tx.file.update({
+  async updateOne(id: string, data: UpdateFileDto) {
+    await this.txHost.tx.file.update({
       where: { id },
       data,
     });
   }
 
-  create(data: { url: string }) {
-    return this.txHost.tx.file.create({ data });
+  async create(data: CreateFileDto): Promise<FileEntity> {
+    const result = await this.txHost.tx.file.create({ data });
+    return PrismaFileMapper.toEntity(result);
   }
 
-  createMany(data: { url: string }[]) {
-    return this.txHost.tx.file.createManyAndReturn({ data });
+  async createMany(data: CreateFileDto[]): Promise<FileEntity[]> {
+    const results = await this.txHost.tx.file.createManyAndReturn({ data });
+    return PrismaFileMapper.toEntities(results);
   }
 
-  delete(id: string) {
-    return this.txHost.tx.file.delete({
+  async delete(id: string): Promise<void> {
+    await this.txHost.tx.file.delete({
       where: { id },
-    });
-  }
-
-  deleteMany(ids: string[]) {
-    return this.txHost.tx.file.deleteMany({
-      where: {
-        id: {
-          in: ids,
-        },
-      },
     });
   }
 }

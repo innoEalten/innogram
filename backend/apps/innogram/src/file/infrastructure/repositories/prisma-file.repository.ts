@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { TransactionHost } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
+import { type FileRepositoryInterface } from '../../domain/repositories';
 
 @Injectable()
-export class FileRepository {
+export class PrismaFileRepository implements FileRepositoryInterface {
   constructor(
     private readonly txHost: TransactionHost<TransactionalAdapterPrisma>,
   ) {}

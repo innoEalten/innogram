@@ -1,18 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { FileSubdirectory } from '@app/shared';
-import { MinioService } from '../minio/minio.service';
-import { FileRepository } from './file.repository';
-import { FileOutboxRepository } from './file-outbox.repository';
+import { MinioService } from '../../../minio/minio.service';
+import { FileOutboxRepository } from '../../file-outbox.repository';
 import { FileAction, type File } from '@prisma/client';
-import { type FileOutboxWithFile } from './utils/file-outbox-with-file-select.util';
+import { type FileOutboxWithFile } from '../../utils/file-outbox-with-file-select.util';
 import { Transactional } from '@nestjs-cls/transactional';
-import { FileOutboxNotFoundError } from './exceptions';
+import { FileOutboxNotFoundError } from '../exceptions';
+import {
+  type FileRepositoryInterface,
+  FileRepositoryInterfaceToken,
+} from '../repositories';
 
 @Injectable()
 export class FileService {
   constructor(
     private readonly minioService: MinioService,
-    private readonly fileRepository: FileRepository,
+    @Inject(FileRepositoryInterfaceToken)
+    private readonly fileRepository: FileRepositoryInterface,
     private readonly fileOutboxRepository: FileOutboxRepository,
   ) {}
 

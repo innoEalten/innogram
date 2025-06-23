@@ -1,22 +1,25 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { FileSubdirectory } from '@app/shared';
 import { MinioService } from '../../../minio/minio.service';
-import { FileOutboxRepository } from '../../file-outbox.repository';
 import { FileAction, type File } from '@prisma/client';
-import { type FileOutboxWithFile } from '../../utils/file-outbox-with-file-select.util';
+import { type FileOutboxWithFile } from '../../infrastructure/utils/file-outbox-with-file-select.util';
 import { Transactional } from '@nestjs-cls/transactional';
-import { FileOutboxNotFoundError } from '../../domain/exceptions';
+import { FileOutboxNotFoundError } from '../exceptions';
 import {
-  type FileRepositoryInterface,
+  type FileRepository,
   FileRepositoryToken,
+  type FileOutboxRepository,
+  FileOutboxRepositoryToken,
 } from '../../domain/repositories';
+import { FileEntity } from '../../domain/entities';
 
 @Injectable()
 export class FileService {
   constructor(
     private readonly minioService: MinioService,
     @Inject(FileRepositoryToken)
-    private readonly fileRepository: FileRepositoryInterface,
+    private readonly fileRepository: FileRepository,
+    @Inject(FileOutboxRepositoryToken)
     private readonly fileOutboxRepository: FileOutboxRepository,
   ) {}
 
@@ -29,15 +32,14 @@ export class FileService {
       subdirectory,
     );
 
-    const uploadedTmpFile = await this.fileRepository.create({
-      url: tmpFilePath,
-    });
+    const uploadedTmpFile = await this.fileRepository.create(
+      new FileEntity(undefined, tmpFilePath),
+    );
 
-    await this.fileOutboxRepository.createOne({
-      fileId: uploadedTmpFile.id,
-      action: FileAction.MOVE_TO_PERMANENT_STORAGE,
-      targetPath: tmpFilePath.replace('tmp/', ''),
-    });
+    await this.fileOutboxRepository.createOne(
+      uploadedTmpFile,
+      FileAction.MOVE_TO_PERMANENT_STORAGE,
+    );
 
     return uploadedTmpFile;
   }
@@ -59,11 +61,8 @@ export class FileService {
       await this.fileRepository.createMany(tmpFileEntities);
 
     await this.fileOutboxRepository.createMany(
-      uploadedTmpFiles.map((tmpFile) => ({
-        fileId: tmpFile.id,
-        action: FileAction.MOVE_TO_PERMANENT_STORAGE,
-        targetPath: tmpFile.url.replace('tmp/', ''),
-      })),
+      uploadedTmpFiles,
+      FileAction.MOVE_TO_PERMANENT_STORAGE,
     );
 
     return uploadedTmpFiles;

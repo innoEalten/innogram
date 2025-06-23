@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { TransactionHost } from '@nestjs-cls/transactional';
 import { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
-import { type FileRepositoryInterface } from '../../domain/repositories';
+import { type FileRepository } from '../../domain/repositories';
 import { PrismaFileMapper } from '../mappers';
 import { FileEntity } from '../../domain/entities';
 import { CreateFileDto, UpdateFileDto } from '../../application/dto';
 
 @Injectable()
-export class PrismaFileRepository implements FileRepositoryInterface {
+export class PrismaFileRepository implements FileRepository {
   constructor(
     private readonly txHost: TransactionHost<TransactionalAdapterPrisma>,
   ) {}
@@ -19,14 +19,17 @@ export class PrismaFileRepository implements FileRepositoryInterface {
     });
   }
 
-  async create(data: CreateFileDto): Promise<FileEntity> {
+  async create(fileEntity: FileEntity): Promise<FileEntity> {
+    const data = PrismaFileMapper.toPrismaEntity(fileEntity);
+
     const result = await this.txHost.tx.file.create({ data });
-    return PrismaFileMapper.toEntity(result);
+
+    return PrismaFileMapper.toDomainEntity(result);
   }
 
   async createMany(data: CreateFileDto[]): Promise<FileEntity[]> {
     const results = await this.txHost.tx.file.createManyAndReturn({ data });
-    return PrismaFileMapper.toEntities(results);
+    return PrismaFileMapper.toDomainEntities(results);
   }
 
   async delete(id: string): Promise<void> {

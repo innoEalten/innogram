@@ -2,15 +2,15 @@ import { File } from '@prisma/client';
 import { FileEntity } from '../../domain/entities';
 
 export class PrismaFileMapper {
-  static toEntity(file: File): FileEntity {
+  static toDomainEntity(file: File): FileEntity {
     return new FileEntity(file.id, file.url);
   }
 
-  static toEntities(files: File[]): FileEntity[] {
-    return files.map((file) => this.toEntity(file));
+  static toDomainEntities(files: File[]): FileEntity[] {
+    return files.map((file) => this.toDomainEntity(file));
   }
 
-  static toPrisma(fileEntity: FileEntity): File {
+  static toPrismaEntity(fileEntity: FileEntity): File {
     return {
       id: fileEntity.id,
       url: fileEntity.url,

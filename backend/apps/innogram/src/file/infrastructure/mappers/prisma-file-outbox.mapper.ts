@@ -1,16 +1,20 @@
-import { FileEntity } from '../../domain/entities';
-import { type FileAction } from '@prisma/client';
+import { FileOutboxEntity } from '../../domain/entities';
 
 export class PrismaFileOutboxMapper {
-  private static getTargetPath(url: string): string {
-    return url.replace('tmp/', '');
+  static toPrismaEntity(fileOutboxEntity: FileOutboxEntity) {
+    return {
+      id: fileOutboxEntity.id,
+      fileId: fileOutboxEntity.fileId,
+      action: fileOutboxEntity.action,
+      createdAt: fileOutboxEntity.createdAt,
+      processed: fileOutboxEntity.processed,
+      targetPath: fileOutboxEntity.targetPath,
+    };
   }
 
-  static toCreateOneOrmEntity(fileEntity: FileEntity, fileAction: FileAction) {
-    return {
-      fileId: fileEntity.id,
-      action: fileAction,
-      targetPath: this.getTargetPath(fileEntity.url),
-    };
+  static toPrismaEntities(fileOutboxEntities: FileOutboxEntity[]) {
+    return fileOutboxEntities.map((fileOutboxEntity) =>
+      this.toPrismaEntity(fileOutboxEntity),
+    );
   }
 }

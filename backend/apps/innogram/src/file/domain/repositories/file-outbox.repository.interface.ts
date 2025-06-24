@@ -1,11 +1,10 @@
-import { FileOutboxEntity, FileEntity } from '../entities';
-import { FileAction } from '@prisma/client';
+import { FileOutboxEntity } from '../entities';
 
 export const FileOutboxRepositoryToken = 'FileOutboxRepositoryToken';
 
 export interface FileOutboxRepository {
-  createOne(fileEntity: FileEntity, fileAction: FileAction): Promise<void>;
-  createMany(fileEntities: FileEntity[], fileAction: FileAction): Promise<void>;
+  createOne(fileOutboxEntity: FileOutboxEntity): Promise<void>;
+  createMany(fileOutboxEntities: FileOutboxEntity[]): Promise<void>;
   updateOne(): Promise<void>;
   findOneWithFile(id: string): Promise<FileOutboxEntity | null>;
 }

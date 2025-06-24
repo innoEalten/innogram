@@ -12,6 +12,7 @@ import {
   FileOutboxRepositoryToken,
 } from '../../domain/repositories';
 import { FileEntity } from '../../domain/entities';
+import { FileOutboxDomainService } from '../../domain/services';
 
 @Injectable()
 export class FileService {
@@ -32,14 +33,18 @@ export class FileService {
       subdirectory,
     );
 
-    const uploadedTmpFile = await this.fileRepository.create(
-      new FileEntity(undefined, tmpFilePath),
+    const uploadedTmpFile = await this.fileRepository.createOne(
+      FileEntity.create({
+        url: tmpFilePath,
+      }),
     );
 
-    await this.fileOutboxRepository.createOne(
+    const fileOutboxEntity = FileOutboxDomainService.createFromFileEntity(
       uploadedTmpFile,
       FileAction.MOVE_TO_PERMANENT_STORAGE,
     );
+
+    await this.fileOutboxRepository.createOne(fileOutboxEntity);
 
     return uploadedTmpFile;
   }
@@ -53,42 +58,45 @@ export class FileService {
       subdirectory,
     );
 
-    const tmpFileEntities = tmpFilePaths.map((tmpFilePath) => ({
-      url: tmpFilePath,
-    }));
-
-    const uploadedTmpFiles =
-      await this.fileRepository.createMany(tmpFileEntities);
-
-    await this.fileOutboxRepository.createMany(
-      uploadedTmpFiles,
-      FileAction.MOVE_TO_PERMANENT_STORAGE,
+    const tmpFileEntities = await this.fileRepository.createMany(
+      tmpFilePaths.map((url) => FileEntity.create({ url })),
     );
 
-    return uploadedTmpFiles;
+    const fileOutboxEntities = tmpFileEntities.map((file) =>
+      FileOutboxDomainService.createFromFileEntity(
+        file,
+        FileAction.MOVE_TO_PERMANENT_STORAGE,
+      ),
+    );
+
+    await this.fileOutboxRepository.createMany(fileOutboxEntities);
+
+    return tmpFileEntities;
   }
 
   private async deleteFile(file: File) {
-    await this.fileRepository.delete(file.id);
+    await this.fileRepository.deleteOne(file.id);
     await this.minioService.removeObject(file.url);
   }
 
   async addFileToDelete(file: File) {
-    await this.fileOutboxRepository.createOne({
-      fileId: file.id,
-      action: FileAction.DELETE_FROM_PERMANENT_STORAGE,
-      targetPath: file.url,
-    });
+    const fileOutboxEntity = FileOutboxDomainService.createFromFileEntity(
+      file,
+      FileAction.DELETE_FROM_PERMANENT_STORAGE,
+    );
+
+    await this.fileOutboxRepository.createOne(fileOutboxEntity);
   }
 
   async addFilesToDelete(files: File[]) {
-    await this.fileOutboxRepository.createMany(
-      files.map((file) => ({
-        fileId: file.id,
-        action: FileAction.DELETE_FROM_PERMANENT_STORAGE,
-        targetPath: file.url,
-      })),
+    const fileOutboxEntities = files.map((file) =>
+      FileOutboxDomainService.createFromFileEntity(
+        file,
+        FileAction.DELETE_FROM_PERMANENT_STORAGE,
+      ),
     );
+
+    await this.fileOutboxRepository.createMany(fileOutboxEntities);
   }
 
   private async moveFileToPermanentStorage(outboxWithFile: FileOutboxWithFile) {

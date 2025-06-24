@@ -3,7 +3,7 @@ import { FileEntity } from '../../domain/entities';
 
 export class PrismaFileMapper {
   static toDomainEntity(file: File): FileEntity {
-    return new FileEntity(file.id, file.url);
+    return FileEntity.create(file);
   }
 
   static toDomainEntities(files: File[]): FileEntity[] {
@@ -15,5 +15,9 @@ export class PrismaFileMapper {
       id: fileEntity.id,
       url: fileEntity.url,
     };
+  }
+
+  static toPrismaEntities(fileEntities: FileEntity[]): File[] {
+    return fileEntities.map((fileEntity) => this.toPrismaEntity(fileEntity));
   }
 }

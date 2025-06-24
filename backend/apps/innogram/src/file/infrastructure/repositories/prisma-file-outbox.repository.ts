@@ -4,8 +4,8 @@ import { Injectable } from '@nestjs/common';
 import { FileOutbox } from '@prisma/client';
 import { selectFileOutboxWithFile } from '../utils/file-outbox-with-file-select.util';
 import { FileOutboxRepository } from '../../domain/repositories';
-import { FileEntity } from '../../domain/entities';
-import { FileAction } from '@prisma/client';
+import { FileOutboxEntity } from '../../domain/entities';
+
 import { PrismaFileOutboxMapper } from '../mappers';
 
 type CreateFileOutboxData = Pick<
@@ -19,22 +19,20 @@ export class PrismaFileOutboxRepository implements FileOutboxRepository {
     private readonly transactionHost: TransactionHost<TransactionalAdapterPrisma>,
   ) {}
 
-  async createOne(
-    fileEntity: FileEntity,
-    fileAction: FileAction,
-  ): Promise<void> {
-    const data = PrismaFileOutboxMapper.toCreateOneOrmEntity(
-      fileEntity,
-      fileAction,
-    );
+  async createOne(fileOutboxEntity: FileOutboxEntity): Promise<void> {
+    const data = PrismaFileOutboxMapper.toPrismaEntity(fileOutboxEntity);
 
     await this.transactionHost.tx.fileOutbox.create({
       data,
     });
   }
 
-  createMany(data: CreateFileOutboxData[]) {
-    return this.transactionHost.tx.fileOutbox.createMany({ data });
+  async createMany(fileOutboxEntities: FileOutboxEntity[]): Promise<void> {
+    const data = PrismaFileOutboxMapper.toPrismaEntities(fileOutboxEntities);
+
+    await this.transactionHost.tx.fileOutbox.createMany({
+      data,
+    });
   }
 
   updateOne(id: string, data: Pick<FileOutbox, 'processed'>) {

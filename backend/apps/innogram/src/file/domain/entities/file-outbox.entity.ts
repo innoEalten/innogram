@@ -1,4 +1,14 @@
 import { FileAction } from '@prisma/client';
+import { randomUUID } from 'crypto';
+
+type FileOutboxData = {
+  id?: string;
+  fileId: string;
+  createdAt?: Date;
+  processed?: boolean;
+  action: FileAction;
+  targetPath: string;
+};
 
 export class FileOutboxEntity {
   constructor(
@@ -9,4 +19,22 @@ export class FileOutboxEntity {
     public readonly action: FileAction,
     public readonly targetPath: string,
   ) {}
+
+  static create({
+    id = randomUUID(),
+    fileId,
+    createdAt = new Date(),
+    processed = false,
+    action,
+    targetPath,
+  }: FileOutboxData): FileOutboxEntity {
+    return new FileOutboxEntity(
+      id,
+      fileId,
+      createdAt,
+      processed,
+      action,
+      targetPath,
+    );
+  }
 }
